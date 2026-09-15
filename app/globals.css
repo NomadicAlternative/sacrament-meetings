@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
+/* Tokens de diseno compartidos.
+   Tailwind 4 los expone automaticamente como utilidades gracias a @theme:
+   --color-card -> bg-card / text-card, --color-muted -> text-muted, etc. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f6f2;
+  --foreground: #1f2421;
+  --card: #ffffff;
+  --border: #e3ded2;
+  --muted: #5f665f;
+  --accent: #3f5a48;
+  --accent-foreground: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #12140f;
+    --foreground: #ecece6;
+    --card: #1b1e19;
+    --border: #333830;
+    --muted: #a8b0a5;
+    --accent: #8fbf9c;
+    --accent-foreground: #12140f;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-border: var(--border);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  /* La variable la define next/font en el layout raiz. */
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Vista de impresion: el programa se imprime solo, sin navegacion ni
+   encabezados. Es el "print view" que pide el assignment, resuelto con CSS
+   en lugar de una ruta aparte. */
+@media print {
+  header,
+  footer,
+  nav {
+    display: none;
+  }
+
+  body {
+    background-color: #ffffff;
+    color: #000000;
+  }
 }
