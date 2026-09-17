@@ -6,7 +6,8 @@ export const MEETING_TYPE_LABELS: Record<MeetingType, string> = {
   testimony: 'Testimony',
   regular: 'Regular',
   stake: 'Stake',
-  general: 'General'
+  general: 'General',
+  special: 'Special'
 };
 
 // Formatea 'YYYY-MM-DD' como 'Sunday, September 13, 2026'.

@@ -2,7 +2,10 @@ export type MeetingType =
   | 'testimony'
   | 'regular'
   | 'stake'
-  | 'general';
+  | 'general'
+  // 'special' is allowed by the database CHECK constraint, so the type has to
+  // allow it too. Otherwise a row with that value would be a lie at runtime.
+  | 'special';
 
 export interface Hymn {
   number: number;
