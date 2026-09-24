@@ -1,5 +1,7 @@
+import Link from 'next/link';
 import type { Hymn as HymnType, SacramentMeeting } from '@/lib/types';
 import { MEETING_TYPE_LABELS, formatMeetingDate } from '@/lib/format';
+import { deleteMeeting } from '@/lib/actions';
 
 interface MeetingDetailProps {
   meeting: SacramentMeeting;
@@ -29,12 +31,36 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
   return (
     <article className="rounded-lg border border-border bg-card p-6 shadow-sm">
       <header className="mb-6 border-b border-border pb-4">
-        <h2 className="text-xl font-semibold tracking-tight">
-          {formatMeetingDate(meeting.date)}
-        </h2>
-        <p className="mt-1 text-sm text-muted">
-          {MEETING_TYPE_LABELS[meeting.meetingType]} meeting
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">
+              {formatMeetingDate(meeting.date)}
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              {MEETING_TYPE_LABELS[meeting.meetingType]} meeting
+            </p>
+          </div>
+          {/* Leader actions: edit this meeting or delete it. The delete form is
+              a Server Action wired directly to a Server Component form, so it
+              needs no 'use client'. */}
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/meetings/${meeting.id}/edit`}
+              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            >
+              Edit
+            </Link>
+            <form action={deleteMeeting}>
+              <input type="hidden" name="id" value={meeting.id} />
+              <button
+                type="submit"
+                className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+              >
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
       </header>
 
       <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">

@@ -59,7 +59,7 @@ export default function MeetingCard({ meeting, index }: MeetingCardProps) {
         <input type="hidden" name="id" value={meeting.id} />
         <button
           type="submit"
-          className="text-sm text-muted underline-offset-4 transition-colors hover:text-red-600 hover:underline"
+          className="rounded-md border border-border px-3 py-1 text-sm font-medium text-muted transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
         >
           Delete
         </button>
