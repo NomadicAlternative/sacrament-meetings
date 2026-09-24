@@ -35,6 +35,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-fade-in-up: fade-in-up 0.3s ease-out both;
 }
 
 body {
@@ -42,6 +44,42 @@ body {
   color: var(--foreground);
   /* La variable la define next/font en el layout raiz. */
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Skeleton loading: a soft gradient sweep that travels left to right. The
+   overlay element starts off-card (-100%) and slides fully across (100%). */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Entrance: cards fade in while drifting up a few pixels. Combined with a
+   per-item animation-delay it produces the staggered list cascade. */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect users who opt out of motion: collapse all animations and transitions
+   to near-instant so hover color changes stay usable without the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Vista de impresion: el programa se imprime solo, sin navegacion ni

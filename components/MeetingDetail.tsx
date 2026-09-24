@@ -27,7 +27,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 export default function MeetingDetail({ meeting }: MeetingDetailProps) {
   return (
-    <article className="rounded-lg border border-border bg-card p-6">
+    <article className="rounded-lg border border-border bg-card p-6 shadow-sm">
       <header className="mb-6 border-b border-border pb-4">
         <h2 className="text-xl font-semibold tracking-tight">
           {formatMeetingDate(meeting.date)}

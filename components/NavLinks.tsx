@@ -9,7 +9,8 @@ import { usePathname } from 'next/navigation';
 const LINKS = [
   { href: '/', label: 'Home' },
   { href: '/meetings', label: 'Meetings' },
-  { href: '/meetings/current', label: 'Current Sunday' }
+  { href: '/meetings/current', label: 'Current Sunday' },
+  { href: '/meetings/new', label: 'Create meeting' }
 ] as const;
 
 // Un enlace esta activo si la ruta actual es exactamente la suya. Para
@@ -40,8 +41,8 @@ export default function NavLinks() {
                 aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'block rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground'
-                    : 'block rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground'
+                    ? 'block rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground transition-colors duration-150'
+                    : 'block rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors duration-150 hover:bg-foreground/5 hover:text-foreground'
                 }
               >
                 {label}

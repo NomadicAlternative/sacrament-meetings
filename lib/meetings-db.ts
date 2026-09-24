@@ -125,21 +125,97 @@ export async function getMeetingByDate(isoDate: string): Promise<SacramentMeetin
   return (rows[0] as unknown as SacramentMeeting) ?? null;
 }
 
-// Mutation stubs. The signatures are in place so Week 04 only has to fill in
-// the bodies once the forms exist.
+// Mutation helpers. The SELECT in RETURNING maps snake_case -> camelCase
+// exactly like the reads above, so addMeeting and updateMeeting return the
+// same shape the rest of the app consumes. JSONB fields are written as JSON
+// strings cast to ::jsonb, matching scripts/seed.mjs.
+
 export async function addMeeting(
-  _data: Omit<SacramentMeeting, 'id'>,
+  data: Omit<SacramentMeeting, 'id'>,
 ): Promise<SacramentMeeting> {
-  throw new Error('addMeeting: implemented in Week 04');
+  const rows = await sql`
+    INSERT INTO meetings (
+      date, meeting_type, presiding, conducting, announcements,
+      opening_hymn, opening_prayer, ward_business, stake_business,
+      sacrament_hymn, speakers, closing_hymn, closing_prayer
+    ) VALUES (
+      ${data.date}, ${data.meetingType}, ${data.presiding}, ${data.conducting},
+      ${data.announcements ?? []},
+      ${JSON.stringify(data.openingHymn)}::jsonb, ${data.openingPrayer},
+      ${JSON.stringify(data.wardBusiness)}::jsonb, ${data.stakeBusiness},
+      ${JSON.stringify(data.sacramentHymn)}::jsonb,
+      ${JSON.stringify(data.speakers)}::jsonb,
+      ${JSON.stringify(data.closingHymn)}::jsonb, ${data.closingPrayer}
+    )
+    RETURNING
+      id,
+      to_char(date, 'YYYY-MM-DD') AS "date",
+      meeting_type                AS "meetingType",
+      presiding,
+      conducting,
+      CASE WHEN cardinality(announcements) = 0 THEN NULL ELSE announcements END AS announcements,
+      opening_hymn                AS "openingHymn",
+      opening_prayer              AS "openingPrayer",
+      ward_business               AS "wardBusiness",
+      stake_business              AS "stakeBusiness",
+      sacrament_hymn              AS "sacramentHymn",
+      speakers,
+      closing_hymn                AS "closingHymn",
+      closing_prayer              AS "closingPrayer"
+  `;
+
+  return rows[0] as unknown as SacramentMeeting;
 }
 
+// COALESCE keeps the existing column value when a field is absent from
+// `updates`. Passing NULL for a JSONB/text column inside `${}` is safe: the
+// ::jsonb cast turns it into NULL::jsonb, so COALESCE falls back to the old
+// value instead of overwriting it.
 export async function updateMeeting(
-  _id: number,
-  _updates: Partial<SacramentMeeting>,
+  id: number,
+  updates: Partial<SacramentMeeting>,
 ): Promise<SacramentMeeting | null> {
-  throw new Error('updateMeeting: implemented in Week 04');
+  const rows = await sql`
+    UPDATE meetings
+    SET
+      date             = COALESCE(${updates.date ?? null}, date),
+      meeting_type     = COALESCE(${updates.meetingType ?? null}, meeting_type),
+      presiding        = COALESCE(${updates.presiding ?? null}, presiding),
+      conducting       = COALESCE(${updates.conducting ?? null}, conducting),
+      announcements    = COALESCE(${updates.announcements ?? null}, announcements),
+      opening_hymn     = COALESCE(${updates.openingHymn ? JSON.stringify(updates.openingHymn) : null}::jsonb, opening_hymn),
+      opening_prayer   = COALESCE(${updates.openingPrayer ?? null}, opening_prayer),
+      ward_business    = COALESCE(${updates.wardBusiness ? JSON.stringify(updates.wardBusiness) : null}::jsonb, ward_business),
+      stake_business   = COALESCE(${updates.stakeBusiness ?? null}, stake_business),
+      sacrament_hymn   = COALESCE(${updates.sacramentHymn ? JSON.stringify(updates.sacramentHymn) : null}::jsonb, sacrament_hymn),
+      speakers         = COALESCE(${updates.speakers ? JSON.stringify(updates.speakers) : null}::jsonb, speakers),
+      closing_hymn     = COALESCE(${updates.closingHymn ? JSON.stringify(updates.closingHymn) : null}::jsonb, closing_hymn),
+      closing_prayer   = COALESCE(${updates.closingPrayer ?? null}, closing_prayer)
+    WHERE id = ${id}
+    RETURNING
+      id,
+      to_char(date, 'YYYY-MM-DD') AS "date",
+      meeting_type                AS "meetingType",
+      presiding,
+      conducting,
+      CASE WHEN cardinality(announcements) = 0 THEN NULL ELSE announcements END AS announcements,
+      opening_hymn                AS "openingHymn",
+      opening_prayer              AS "openingPrayer",
+      ward_business               AS "wardBusiness",
+      stake_business              AS "stakeBusiness",
+      sacrament_hymn              AS "sacramentHymn",
+      speakers,
+      closing_hymn                AS "closingHymn",
+      closing_prayer              AS "closingPrayer"
+  `;
+
+  return (rows[0] as unknown as SacramentMeeting) ?? null;
 }
 
-export async function deleteMeeting(_id: number): Promise<boolean> {
-  throw new Error('deleteMeeting: implemented in Week 04');
+export async function deleteMeeting(id: number): Promise<boolean> {
+  const rows = await sql`
+    DELETE FROM meetings WHERE id = ${id} RETURNING id
+  `;
+
+  return rows.length > 0;
 }

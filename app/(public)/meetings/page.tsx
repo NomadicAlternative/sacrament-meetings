@@ -31,8 +31,8 @@ export default async function MeetingsPage({
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
-          {meetings.map((meeting) => (
-            <MeetingCard key={meeting.id} meeting={meeting} />
+          {meetings.map((meeting, index) => (
+            <MeetingCard key={meeting.id} meeting={meeting} index={index} />
           ))}
         </ul>
       )}

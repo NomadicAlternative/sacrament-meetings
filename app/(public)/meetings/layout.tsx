@@ -20,7 +20,7 @@ export default function MeetingsLayout({
         </p>
         <Link
           href="/meetings/current"
-          className="w-fit text-sm font-medium text-accent underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="w-fit text-sm font-medium text-accent underline-offset-4 transition-colors duration-150 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           Jump to this Sunday
         </Link>
