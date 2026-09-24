@@ -13,7 +13,7 @@ export default function Loading() {
           <li
             key={index}
             className="animate-fade-in-up"
-            style={{ animationDelay: `${index * 80}ms` }}
+            style={{ animationDelay: `${Math.min(index, 4) * 40}ms` }}
           >
             <div className="relative overflow-hidden rounded-lg border border-border bg-card p-5">
               {/* Shimmer sweep travels across the card; keep it non-interactive

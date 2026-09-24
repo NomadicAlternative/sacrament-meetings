@@ -28,8 +28,8 @@ export default function NavLinks() {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Main">
-      <ul className="flex flex-wrap items-center gap-1">
+    <nav aria-label="Main" className="-mx-1 px-1">
+      <ul className="flex items-center gap-1 overflow-x-auto">
         {LINKS.map(({ href, label }) => {
           const active = isActive(pathname, href);
           return (
@@ -41,8 +41,8 @@ export default function NavLinks() {
                 aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'block rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground transition-colors duration-150'
-                    : 'block rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors duration-150 hover:bg-foreground/5 hover:text-foreground'
+                    ? 'block whitespace-nowrap rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground transition-colors duration-150'
+                    : 'block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors duration-150 hover:bg-foreground/5 hover:text-foreground'
                 }
               >
                 {label}

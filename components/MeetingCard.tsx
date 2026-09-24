@@ -20,7 +20,7 @@ export default function MeetingCard({ meeting, index }: MeetingCardProps) {
   return (
     <li
       className="flex flex-col animate-fade-in-up"
-      style={index !== undefined ? { animationDelay: `${index * 60}ms` } : undefined}
+      style={index !== undefined ? { animationDelay: `${Math.min(index, 4) * 40}ms` } : undefined}
     >
       <Link
         href={`/meetings/${meeting.id}`}
