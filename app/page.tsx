@@ -13,22 +13,22 @@ export default function Home() {
           let members view and print the programs for the current and past
           weeks.
         </p>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link
             href="/meetings"
-            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-accent-foreground shadow-sm transition duration-150 ease-out hover:opacity-90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-md bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground shadow-sm transition duration-150 ease-out hover:opacity-90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             View meetings
           </Link>
           <Link
             href="/meetings/current"
-            className="rounded-md border border-border px-4 py-2 text-sm font-medium transition duration-150 ease-out hover:border-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-md border border-border px-4 py-2 text-center text-sm font-medium transition duration-150 ease-out hover:border-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             This Sunday&rsquo;s program
           </Link>
           <Link
             href="/meetings/new"
-            className="rounded-md border border-border px-4 py-2 text-sm font-medium transition duration-150 ease-out hover:border-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            className="rounded-md border border-border px-4 py-2 text-center text-sm font-medium transition duration-150 ease-out hover:border-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Create meeting
           </Link>
