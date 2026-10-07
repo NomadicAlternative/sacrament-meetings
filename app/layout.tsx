@@ -14,10 +14,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// metadataBase resuelve a la URL real del deployment en Vercel (preview o
+// produccion) para que la imagen Open Graph siempre apunte al origen correcto.
+const baseUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Sacrament Meeting Planner",
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: "Sacrament Meeting Planner",
+    template: "%s | Sacrament Meeting Planner",
+  },
   description:
-    "Plan and review sacrament meeting agendas, and view the programs for the current and past weeks.",
+    "Plan and review sacrament meeting agendas for the Maplewood Ward, including programs for the current and past Sundays.",
+  openGraph: {
+    title: "Sacrament Meeting Planner",
+    description:
+      "Plan and review sacrament meeting agendas for the Maplewood Ward.",
+    type: "website",
+    siteName: "Sacrament Meeting Planner",
+  },
 };
 
 // LayoutProps<'/'> es un helper global de Next.js 16: infiere los props del

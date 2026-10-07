@@ -2,6 +2,8 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { AuthError } from 'next-auth';
+import { auth, signIn } from '@/auth';
 import {
   MeetingFormSchema,
   type MeetingFormInput,
@@ -121,6 +123,8 @@ export async function createMeeting(
   prevState: MeetingFormState,
   formData: FormData,
 ): Promise<MeetingFormState> {
+  await requireOwnerSession();
+
   const validatedFields = MeetingFormSchema.safeParse(formDataToInput(formData));
 
   if (!validatedFields.success) {
@@ -145,6 +149,8 @@ export async function updateMeeting(
   prevState: MeetingFormState,
   formData: FormData,
 ): Promise<MeetingFormState> {
+  await requireOwnerSession();
+
   const validatedFields = MeetingFormSchema.safeParse(formDataToInput(formData));
 
   if (!validatedFields.success) {
@@ -169,6 +175,8 @@ export async function updateMeeting(
 }
 
 export async function deleteMeeting(formData: FormData): Promise<void> {
+  await requireOwnerSession();
+
   const id = Number(formData.get('id'));
 
   try {
@@ -181,4 +189,34 @@ export async function deleteMeeting(formData: FormData): Promise<void> {
 
   revalidatePath('/meetings');
   redirect('/meetings');
+}
+
+// Throws unless a bishopric member is signed in. The middleware already keeps
+// the admin pages behind a redirect, but this is defense in depth: a direct
+// POST to a Server Action must also be rejected, not just the page UI.
+async function requireOwnerSession() {
+  const session = await auth();
+  if (!session?.user) throw new Error('Not authenticated');
+  return session;
+}
+
+// Sign-in Server Action consumed by the login form via useActionState.
+// signIn throws a redirect on success, so it must not be swallowed here.
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+): Promise<string | undefined> {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid email or password.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error; // re-throw so Next.js handles the redirect correctly
+  }
 }

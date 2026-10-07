@@ -6,12 +6,18 @@ import { usePathname } from 'next/navigation';
 // usePathname es un hook de Client Component: por eso este archivo empieza
 // con 'use client'. El resto de la app sigue siendo Server Components.
 
-const LINKS = [
+type NavLink = {
+  href: string;
+  label: string;
+  authOnly?: boolean;
+};
+
+const LINKS: NavLink[] = [
   { href: '/', label: 'Home' },
   { href: '/meetings', label: 'Meetings' },
   { href: '/meetings/current', label: 'Current Sunday' },
-  { href: '/meetings/new', label: 'Create meeting' }
-] as const;
+  { href: '/meetings/new', label: 'Create meeting', authOnly: true }
+];
 
 // Un enlace esta activo si la ruta actual es exactamente la suya. Para
 // "Meetings" tambien cuenta el detalle (/meetings/3), pero NO /meetings/current,
@@ -24,13 +30,18 @@ function isActive(pathname: string, href: string): boolean {
   return pathname === href;
 }
 
-export default function NavLinks() {
+// Recibe el estado de sesion desde el Header (Server Component). El enlace de
+// creacion solo se muestra a quien inicio sesion; la ruta sigue protegida por
+// el middleware aunque alguien ingrese la URL a mano.
+export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
   const pathname = usePathname();
+
+  const visibleLinks = LINKS.filter((link) => !link.authOnly || isLoggedIn);
 
   return (
     <nav aria-label="Main" className="-mx-1 px-1">
       <ul className="flex items-center gap-1 overflow-x-auto">
-        {LINKS.map(({ href, label }) => {
+        {visibleLinks.map(({ href, label }) => {
           const active = isActive(pathname, href);
           return (
             <li key={href}>

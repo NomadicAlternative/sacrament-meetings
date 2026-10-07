@@ -1,8 +1,15 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import MeetingCard from '@/components/MeetingCard';
 import MeetingSearch from '@/components/MeetingSearch';
 import Pagination from '@/components/Pagination';
 import { getMeetings, getMeetingsTotalPages } from '@/lib/meetings-db';
+
+export const metadata: Metadata = {
+  title: 'Sacrament Meetings',
+  description:
+    'Browse past and upcoming sacrament meetings for the Maplewood Ward.',
+};
 
 // The list page reads its state from the URL. `searchParams` is a Promise in
 // Next.js 15+, exactly like `params`, so it has to be awaited.
