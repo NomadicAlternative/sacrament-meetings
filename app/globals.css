@@ -4,24 +4,24 @@
    Tailwind 4 los expone automaticamente como utilidades gracias a @theme:
    --color-card -> bg-card / text-card, --color-muted -> text-muted, etc. */
 :root {
-  --background: #f7f6f2;
-  --foreground: #1f2421;
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --card: #ffffff;
-  --border: #e3ded2;
-  --muted: #5f665f;
-  --accent: #3f5a48;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --accent: #1f4b88;
   --accent-foreground: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #12140f;
-    --foreground: #ecece6;
-    --card: #1b1e19;
-    --border: #333830;
-    --muted: #a8b0a5;
-    --accent: #8fbf9c;
-    --accent-foreground: #12140f;
+    --background: #0f172a;
+    --foreground: #e2e8f0;
+    --card: #1e293b;
+    --border: #334155;
+    --muted: #94a3b8;
+    --accent: #8fb3df;
+    --accent-foreground: #0f172a;
   }
 }
 

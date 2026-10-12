@@ -1,11 +1,19 @@
 import { redirect } from 'next/navigation';
 import { getBaseUrl } from '@/lib/api';
 import { toIsoDate } from '@/lib/format';
+import { isLocale, type Locale } from '@/lib/i18n';
 import type { SacramentMeeting } from '@/lib/types';
 
 // Redirige al programa del domingo mas reciente.
 // Si no hay reunion cargada para esa fecha, cae a /meetings.
-export default async function CurrentMeetingPage() {
+export default async function CurrentMeetingPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const loc: Locale = isLocale(locale) ? locale : 'es';
+
   const today = new Date();
   // getDay(): domingo = 0, lunes = 1, ... sabado = 6.
   // Restamos ese numero de dias para retroceder hasta el domingo.
@@ -16,18 +24,18 @@ export default async function CurrentMeetingPage() {
   const isoDate = toIsoDate(sunday);
   const baseUrl = await getBaseUrl();
   const response = await fetch(`${baseUrl}/api/meetings?date=${isoDate}`, {
-    cache: 'no-store'
+    cache: 'no-store',
   });
 
   if (!response.ok) {
-    redirect('/meetings');
+    redirect(`/${loc}/meetings`);
   }
 
   const matches = (await response.json()) as SacramentMeeting[];
 
   if (matches.length === 0) {
-    redirect('/meetings');
+    redirect(`/${loc}/meetings`);
   }
 
-  redirect(`/meetings/${matches[0].id}`);
+  redirect(`/${loc}/meetings/${matches[0].id}`);
 }

@@ -7,7 +7,7 @@ import { getUserByEmail } from '@/lib/users';
 
 // Full config with the Credentials provider. bcrypt and the user lookup are
 // safe here because middleware imports auth.config.ts, never this file.
-export const { auth, signIn, signOut } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   // Vercel and localhost sit behind a proxy, so Auth.js must trust the
   // forwarded host header to avoid the "UntrustedHost" error in production.
@@ -16,7 +16,7 @@ export const { auth, signIn, signOut } = NextAuth({
     Credentials({
       async authorize(credentials) {
         const parsed = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({ email: z.string().email(), password: z.string().min(4) })
           .safeParse(credentials);
 
         if (!parsed.success) return null;

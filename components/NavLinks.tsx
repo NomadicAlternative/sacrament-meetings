@@ -2,51 +2,56 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useLocale } from '@/components/locale-provider';
 
 // usePathname es un hook de Client Component: por eso este archivo empieza
 // con 'use client'. El resto de la app sigue siendo Server Components.
 
 type NavLink = {
-  href: string;
+  path: string;
   label: string;
   authOnly?: boolean;
 };
 
-const LINKS: NavLink[] = [
-  { href: '/', label: 'Home' },
-  { href: '/meetings', label: 'Meetings' },
-  { href: '/meetings/current', label: 'Current Sunday' },
-  { href: '/meetings/new', label: 'Create meeting', authOnly: true }
-];
-
-// Un enlace esta activo si la ruta actual es exactamente la suya. Para
-// "Meetings" tambien cuenta el detalle (/meetings/3), pero NO /meetings/current,
-// que tiene su propio enlace.
-function isActive(pathname: string, href: string): boolean {
-  if (href === '/') return pathname === '/';
-  if (href === '/meetings') {
-    return pathname === '/meetings' || /^\/meetings\/\d+$/.test(pathname);
+// Un enlace esta activo si la ruta actual (sin el prefijo de idioma) es
+// exactamente la suya. Para "Meetings" tambien cuenta el detalle
+// (/meetings/3), pero NO /meetings/current, que tiene su propio enlace.
+function isActive(localPath: string, path: string): boolean {
+  if (path === '/') return localPath === '/';
+  if (path === '/meetings') {
+    return localPath === '/meetings' || /^\/meetings\/\d+$/.test(localPath);
   }
-  return pathname === href;
+  return localPath === path;
 }
 
 // Recibe el estado de sesion desde el Header (Server Component). El enlace de
 // creacion solo se muestra a quien inicio sesion; la ruta sigue protegida por
 // el middleware aunque alguien ingrese la URL a mano.
 export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const { locale, t } = useLocale();
   const pathname = usePathname();
 
-  const visibleLinks = LINKS.filter((link) => !link.authOnly || isLoggedIn);
+  // Quita el prefijo de idioma: /es/meetings -> /meetings.
+  const localPath = pathname.replace(/^\/(es|pt)(?=\/|$)/, '') || '/';
+
+  const links: NavLink[] = [
+    { path: '/', label: t('nav.home') },
+    { path: '/meetings', label: t('nav.meetings') },
+    { path: '/meetings/current', label: t('nav.current') },
+    { path: '/meetings/new', label: t('nav.create'), authOnly: true },
+  ];
+
+  const visibleLinks = links.filter((link) => !link.authOnly || isLoggedIn);
 
   return (
-    <nav aria-label="Main" className="-mx-1 px-1">
+    <nav aria-label={t('nav.main')} className="-mx-1 px-1">
       <ul className="flex items-center gap-1 overflow-x-auto">
-        {visibleLinks.map(({ href, label }) => {
-          const active = isActive(pathname, href);
+        {visibleLinks.map(({ path, label }) => {
+          const active = isActive(localPath, path);
           return (
-            <li key={href}>
+            <li key={path}>
               <Link
-                href={href}
+                href={`/${locale}${path === '/' ? '' : path}`}
                 // aria-current le dice al lector de pantalla cual es la pagina
                 // actual: el color solo no comunica nada a quien no lo ve.
                 aria-current={active ? 'page' : undefined}

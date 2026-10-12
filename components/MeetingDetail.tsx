@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import type { Hymn as HymnType, SacramentMeeting } from '@/lib/types';
-import { MEETING_TYPE_LABELS, formatMeetingDate } from '@/lib/format';
+import { formatMeetingDate } from '@/lib/format';
 import { deleteMeeting } from '@/lib/actions';
+import { getDictionary, type Dictionary, type Locale } from '@/lib/i18n';
 
 interface MeetingDetailProps {
   meeting: SacramentMeeting;
+  locale: Locale;
 }
 
 // Sub-componente local: el par numero + titulo se repite en tres himnos.
@@ -16,7 +18,13 @@ function Hymn({ hymn }: { hymn: HymnType }) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <dt className="text-xs font-medium uppercase tracking-wide text-muted">
@@ -27,36 +35,41 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export default function MeetingDetail({ meeting }: MeetingDetailProps) {
+export default function MeetingDetail({
+  meeting,
+  locale,
+}: MeetingDetailProps) {
+  const dict = getDictionary(locale);
+  const typeLabel = dict[`type.${meeting.meetingType}` as keyof Dictionary];
+
   return (
     <article className="rounded-lg border border-border bg-card p-6 shadow-sm">
       <header className="mb-6 border-b border-border pb-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold tracking-tight">
-              {formatMeetingDate(meeting.date)}
+              {formatMeetingDate(meeting.date, locale)}
             </h2>
-            <p className="mt-1 text-sm text-muted">
-              {MEETING_TYPE_LABELS[meeting.meetingType]} meeting
-            </p>
+            <p className="mt-1 text-sm text-muted">{typeLabel}</p>
           </div>
           {/* Leader actions: edit this meeting or delete it. The delete form is
               a Server Action wired directly to a Server Component form, so it
               needs no 'use client'. */}
           <div className="flex items-center gap-2">
             <Link
-              href={`/meetings/${meeting.id}/edit`}
+              href={`/${locale}/meetings/${meeting.id}/edit`}
               className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
-              Edit
+              {dict['detail.edit']}
             </Link>
             <form action={deleteMeeting}>
               <input type="hidden" name="id" value={meeting.id} />
+              <input type="hidden" name="locale" value={locale} />
               <button
                 type="submit"
                 className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
               >
-                Delete
+                {dict['detail.delete']}
               </button>
             </form>
           </div>
@@ -64,26 +77,32 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
       </header>
 
       <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
-        <Field label="Presiding">{meeting.presiding}</Field>
-        <Field label="Conducting">{meeting.conducting}</Field>
-        <Field label="Opening hymn">
+        <Field label={dict['detail.presiding']}>{meeting.presiding}</Field>
+        <Field label={dict['detail.conducting']}>{meeting.conducting}</Field>
+        <Field label={dict['detail.openingHymn']}>
           <Hymn hymn={meeting.openingHymn} />
         </Field>
-        <Field label="Opening prayer">{meeting.openingPrayer}</Field>
-        <Field label="Sacrament hymn">
+        <Field label={dict['detail.openingPrayer']}>
+          {meeting.openingPrayer}
+        </Field>
+        <Field label={dict['detail.sacramentHymn']}>
           <Hymn hymn={meeting.sacramentHymn} />
         </Field>
-        <Field label="Stake business">
-          {meeting.stakeBusiness ? 'Yes' : 'No'}
+        <Field label={dict['detail.stakeBusiness']}>
+          {meeting.stakeBusiness ? dict['detail.yes'] : dict['detail.no']}
         </Field>
-        <Field label="Closing hymn">
+        <Field label={dict['detail.closingHymn']}>
           <Hymn hymn={meeting.closingHymn} />
         </Field>
-        <Field label="Closing prayer">{meeting.closingPrayer}</Field>
+        <Field label={dict['detail.closingPrayer']}>
+          {meeting.closingPrayer}
+        </Field>
       </dl>
 
       <section className="mt-6">
-        <h3 className="text-sm font-semibold tracking-tight">Ward business</h3>
+        <h3 className="text-sm font-semibold tracking-tight">
+          {dict['detail.wardBusiness']}
+        </h3>
         {meeting.wardBusiness.length > 0 ? (
           <ul className="mt-2 list-disc pl-5 text-sm text-muted">
             {meeting.wardBusiness.map((item) => (
@@ -91,13 +110,13 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-sm text-muted">None</p>
+          <p className="mt-2 text-sm text-muted">{dict['detail.none']}</p>
         )}
       </section>
 
       <section className="mt-6">
         <h3 className="text-sm font-semibold tracking-tight">
-          Speakers and musical numbers
+          {dict['detail.speakersTitle']}
         </h3>
         {meeting.speakers.length > 0 ? (
           <ol className="mt-2 flex flex-col gap-2 text-sm">
@@ -106,7 +125,10 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
                 <span className="font-medium">{item.name}</span>
                 {/* 'type' permite acotar la union: solo un 'speaker' tiene tema. */}
                 {item.type === 'musical-number' ? (
-                  <span className="text-muted"> &mdash; musical number</span>
+                  <span className="text-muted">
+                    {' '}
+                    &mdash; {dict['detail.musicalNumber']}
+                  </span>
                 ) : (
                   <span className="text-muted"> &mdash; {item.topic}</span>
                 )}
@@ -114,7 +136,7 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
             ))}
           </ol>
         ) : (
-          <p className="mt-2 text-sm text-muted">No speakers assigned.</p>
+          <p className="mt-2 text-sm text-muted">{dict['detail.noSpeakers']}</p>
         )}
       </section>
 
@@ -122,7 +144,9 @@ export default function MeetingDetail({ meeting }: MeetingDetailProps) {
           no se renderiza. Distinto de existir con lista vacia. */}
       {meeting.announcements ? (
         <section className="mt-6">
-          <h3 className="text-sm font-semibold tracking-tight">Announcements</h3>
+          <h3 className="text-sm font-semibold tracking-tight">
+            {dict['detail.announcements']}
+          </h3>
           <ul className="mt-2 list-disc pl-5 text-sm text-muted">
             {meeting.announcements.map((item) => (
               <li key={item}>{item}</li>

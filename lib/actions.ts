@@ -14,6 +14,7 @@ import {
   updateMeeting as updateMeetingRow,
   deleteMeeting as deleteMeetingRow,
 } from '@/lib/meetings-db';
+import type { Locale } from '@/lib/i18n';
 import type {
   MeetingType,
   SacramentMeeting,
@@ -120,6 +121,7 @@ function buildMeeting(data: MeetingFormInput): Omit<SacramentMeeting, 'id'> {
 }
 
 export async function createMeeting(
+  locale: Locale,
   prevState: MeetingFormState,
   formData: FormData,
 ): Promise<MeetingFormState> {
@@ -140,12 +142,13 @@ export async function createMeeting(
     return { message: 'Database error: could not create the meeting.' };
   }
 
-  revalidatePath('/meetings');
-  redirect('/meetings');
+  revalidatePath(`/${locale}/meetings`);
+  redirect(`/${locale}/meetings`);
 }
 
 export async function updateMeeting(
   id: number,
+  locale: Locale,
   prevState: MeetingFormState,
   formData: FormData,
 ): Promise<MeetingFormState> {
@@ -161,7 +164,10 @@ export async function updateMeeting(
   }
 
   try {
-    const updated = await updateMeetingRow(id, buildMeeting(validatedFields.data));
+    const updated = await updateMeetingRow(
+      id,
+      buildMeeting(validatedFields.data),
+    );
 
     if (!updated) {
       return { message: 'This meeting no longer exists.' };
@@ -170,14 +176,15 @@ export async function updateMeeting(
     return { message: 'Database error: could not update the meeting.' };
   }
 
-  revalidatePath('/meetings');
-  redirect('/meetings');
+  revalidatePath(`/${locale}/meetings`);
+  redirect(`/${locale}/meetings`);
 }
 
 export async function deleteMeeting(formData: FormData): Promise<void> {
   await requireOwnerSession();
 
   const id = Number(formData.get('id'));
+  const locale = (formData.get('locale') as string) || 'es';
 
   try {
     await deleteMeetingRow(id);
@@ -187,8 +194,8 @@ export async function deleteMeeting(formData: FormData): Promise<void> {
     // error into a dead end.
   }
 
-  revalidatePath('/meetings');
-  redirect('/meetings');
+  revalidatePath(`/${locale}/meetings`);
+  redirect(`/${locale}/meetings`);
 }
 
 // Throws unless a bishopric member is signed in. The middleware already keeps
@@ -202,6 +209,8 @@ async function requireOwnerSession() {
 
 // Sign-in Server Action consumed by the login form via useActionState.
 // signIn throws a redirect on success, so it must not be swallowed here.
+// The form includes a hidden `callbackUrl` so the user lands on the localized
+// meetings list after signing in.
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,

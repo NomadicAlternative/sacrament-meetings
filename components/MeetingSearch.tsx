@@ -2,6 +2,7 @@
 
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import { useDebouncedCallback } from 'use-debounce';
+import { useLocale } from '@/components/locale-provider';
 
 // Reads and writes the `query` parameter in the URL.
 //
@@ -12,6 +13,7 @@ export default function MeetingSearch() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+  const { t } = useLocale();
 
   // 300ms after the user stops typing. Without this, every keystroke would be
   // a database query — typing "testimony" would be nine round trips instead of
@@ -36,17 +38,17 @@ export default function MeetingSearch() {
   return (
     <div className="mb-6">
       <label htmlFor="meeting-search" className="sr-only">
-        Search meetings
+        {t('meetings.searchLabel')}
       </label>
       <input
         id="meeting-search"
         type="search"
-        placeholder="Search by speaker, leader, or meeting type..."
+        placeholder={t('meetings.searchPlaceholder')}
         // defaultValue, not value: the URL is the source of truth, so the
         // input is seeded from it once and then left to the browser.
         defaultValue={searchParams.get('query')?.toString()}
         onChange={(event) => handleSearch(event.target.value)}
-        aria-label="Search meetings"
+        aria-label={t('meetings.searchLabel')}
         className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       />
     </div>

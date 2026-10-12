@@ -1,9 +1,10 @@
 'use client';
 
 import { useActionState } from 'react';
-import { MEETING_TYPE_LABELS } from '@/lib/format';
+import type { Dictionary } from '@/lib/i18n';
+import { useLocale } from '@/components/locale-provider';
 import type { MeetingFormState } from '@/lib/meeting-form-schema';
-import type { SacramentMeeting } from '@/lib/types';
+import type { MeetingType, SacramentMeeting } from '@/lib/types';
 
 // Shared by the create and edit pages. `action` is the Server Action to run on
 // submit (already bound with the id when editing); `defaultValues` pre-fills
@@ -20,6 +21,14 @@ const initialState: MeetingFormState = {
   message: null,
   errors: {},
 };
+
+const MEETING_TYPES: MeetingType[] = [
+  'testimony',
+  'regular',
+  'stake',
+  'general',
+  'special',
+];
 
 // The inputs sit on top of the bg-card container, so they use bg-background to
 // stay visible instead of blending into the card.
@@ -44,8 +53,12 @@ function FieldError({ id, errors }: { id: string; errors?: string[] }) {
   );
 }
 
-export default function MeetingForm({ action, defaultValues }: MeetingFormProps) {
+export default function MeetingForm({
+  action,
+  defaultValues,
+}: MeetingFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState);
+  const { t } = useLocale();
 
   const isEditing = defaultValues != null;
 
@@ -66,8 +79,8 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
     ? (defaultValues.announcements ?? []).join('\n')
     : '';
 
-  const idleLabel = isEditing ? 'Save changes' : 'Create meeting';
-  const pendingLabel = isEditing ? 'Saving...' : 'Creating...';
+  const idleLabel = isEditing ? t('form.save') : t('form.create');
+  const pendingLabel = isEditing ? t('form.saving') : t('form.creating');
 
   return (
     <form action={formAction} className="mt-6 flex flex-col gap-6">
@@ -79,7 +92,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
 
       <div className="flex flex-col gap-1">
         <label htmlFor="date" className={labelClass}>
-          Date
+          {t('form.date')}
         </label>
         <input
           id="date"
@@ -95,7 +108,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
 
       <div className="flex flex-col gap-1">
         <label htmlFor="meetingType" className={labelClass}>
-          Meeting type
+          {t('form.meetingType')}
         </label>
         <select
           id="meetingType"
@@ -106,22 +119,20 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           className={inputClass}
         >
           <option value="" disabled>
-            Select a type
+            {t('form.selectType')}
           </option>
-          {(Object.keys(MEETING_TYPE_LABELS) as Array<keyof typeof MEETING_TYPE_LABELS>).map(
-            (type) => (
-              <option key={type} value={type}>
-                {MEETING_TYPE_LABELS[type]}
-              </option>
-            )
-          )}
+          {MEETING_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {t(`type.${type}` as keyof Dictionary)}
+            </option>
+          ))}
         </select>
         <FieldError id="meetingType-error" errors={state.errors?.meetingType} />
       </div>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="presiding" className={labelClass}>
-          Presiding
+          {t('form.presiding')}
         </label>
         <input
           id="presiding"
@@ -137,7 +148,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
 
       <div className="flex flex-col gap-1">
         <label htmlFor="conducting" className={labelClass}>
-          Conducting
+          {t('form.conducting')}
         </label>
         <input
           id="conducting"
@@ -152,11 +163,11 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
       </div>
 
       <fieldset className="flex flex-col gap-1">
-        <legend className={labelClass}>Opening hymn</legend>
+        <legend className={labelClass}>{t('form.openingHymn')}</legend>
         <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
           <div className="flex flex-col gap-1">
             <label htmlFor="openingHymnNumber" className="text-xs text-muted">
-              Number
+              {t('form.number')}
             </label>
             <input
               id="openingHymnNumber"
@@ -175,7 +186,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="openingHymnTitle" className="text-xs text-muted">
-              Title
+              {t('form.title')}
             </label>
             <input
               id="openingHymnTitle"
@@ -196,7 +207,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
 
       <div className="flex flex-col gap-1">
         <label htmlFor="openingPrayer" className={labelClass}>
-          Opening prayer
+          {t('form.openingPrayer')}
         </label>
         <input
           id="openingPrayer"
@@ -207,15 +218,18 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           aria-describedby="openingPrayer-error"
           className={inputClass}
         />
-        <FieldError id="openingPrayer-error" errors={state.errors?.openingPrayer} />
+        <FieldError
+          id="openingPrayer-error"
+          errors={state.errors?.openingPrayer}
+        />
       </div>
 
       <fieldset className="flex flex-col gap-1">
-        <legend className={labelClass}>Sacrament hymn</legend>
+        <legend className={labelClass}>{t('form.sacramentHymn')}</legend>
         <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
           <div className="flex flex-col gap-1">
             <label htmlFor="sacramentHymnNumber" className="text-xs text-muted">
-              Number
+              {t('form.number')}
             </label>
             <input
               id="sacramentHymnNumber"
@@ -234,7 +248,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="sacramentHymnTitle" className="text-xs text-muted">
-              Title
+              {t('form.title')}
             </label>
             <input
               id="sacramentHymnTitle"
@@ -254,11 +268,11 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
       </fieldset>
 
       <fieldset className="flex flex-col gap-1">
-        <legend className={labelClass}>Closing hymn</legend>
+        <legend className={labelClass}>{t('form.closingHymn')}</legend>
         <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
           <div className="flex flex-col gap-1">
             <label htmlFor="closingHymnNumber" className="text-xs text-muted">
-              Number
+              {t('form.number')}
             </label>
             <input
               id="closingHymnNumber"
@@ -277,7 +291,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           </div>
           <div className="flex flex-col gap-1">
             <label htmlFor="closingHymnTitle" className="text-xs text-muted">
-              Title
+              {t('form.title')}
             </label>
             <input
               id="closingHymnTitle"
@@ -298,7 +312,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
 
       <div className="flex flex-col gap-1">
         <label htmlFor="closingPrayer" className={labelClass}>
-          Closing prayer
+          {t('form.closingPrayer')}
         </label>
         <input
           id="closingPrayer"
@@ -309,7 +323,10 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           aria-describedby="closingPrayer-error"
           className={inputClass}
         />
-        <FieldError id="closingPrayer-error" errors={state.errors?.closingPrayer} />
+        <FieldError
+          id="closingPrayer-error"
+          errors={state.errors?.closingPrayer}
+        />
       </div>
 
       <div className="flex items-center gap-2">
@@ -322,14 +339,14 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           className="h-4 w-4 rounded border-border accent-accent"
         />
         <label htmlFor="stakeBusiness" className="text-sm">
-          Stake business
+          {t('form.stakeBusiness')}
         </label>
       </div>
       <FieldError id="stakeBusiness-error" errors={state.errors?.stakeBusiness} />
 
       <div className="flex flex-col gap-1">
         <label htmlFor="announcements" className={labelClass}>
-          Announcements
+          {t('form.announcements')}
         </label>
         <textarea
           id="announcements"
@@ -339,13 +356,16 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           aria-describedby="announcements-error"
           className={inputClass}
         />
-        <p className="text-xs text-muted">One announcement per line.</p>
-        <FieldError id="announcements-error" errors={state.errors?.announcements} />
+        <p className="text-xs text-muted">{t('form.oneAnnouncementPerLine')}</p>
+        <FieldError
+          id="announcements-error"
+          errors={state.errors?.announcements}
+        />
       </div>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="wardBusiness" className={labelClass}>
-          Ward business
+          {t('form.wardBusiness')}
         </label>
         <textarea
           id="wardBusiness"
@@ -355,13 +375,13 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           aria-describedby="wardBusiness-error"
           className={inputClass}
         />
-        <p className="text-xs text-muted">One item per line.</p>
+        <p className="text-xs text-muted">{t('form.oneItemPerLine')}</p>
         <FieldError id="wardBusiness-error" errors={state.errors?.wardBusiness} />
       </div>
 
       <div className="flex flex-col gap-1">
         <label htmlFor="speakers" className={labelClass}>
-          Speakers and musical numbers
+          {t('form.speakersTitle')}
         </label>
         <textarea
           id="speakers"
@@ -371,10 +391,7 @@ export default function MeetingForm({ action, defaultValues }: MeetingFormProps)
           aria-describedby="speakers-error"
           className={inputClass}
         />
-        <p className="text-xs text-muted">
-          One per line: Name | Topic | speaker (use &ldquo;musical-number&rdquo;
-          instead of &ldquo;speaker&rdquo; for musical numbers).
-        </p>
+        <p className="text-xs text-muted">{t('form.onePerLineHint')}</p>
         <FieldError id="speakers-error" errors={state.errors?.speakers} />
       </div>
 

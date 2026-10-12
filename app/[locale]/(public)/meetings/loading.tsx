@@ -1,3 +1,7 @@
+'use client';
+
+import { useLocale } from '@/components/locale-provider';
+
 // Skeleton placeholders that mirror the MeetingCard layout (rounded card with
 // a title bar and a few text lines). Each one fades in on a staggered delay so
 // they appear in a cascade while the real list loads.
@@ -5,9 +9,11 @@
 const SKELETON_COUNT = 5;
 
 export default function Loading() {
+  const { t } = useLocale();
+
   return (
     <div role="status" aria-live="polite" className="py-8">
-      <span className="sr-only">Loading meetings&hellip;</span>
+      <span className="sr-only">{t('common.loading')}</span>
       <ul className="grid gap-4 sm:grid-cols-2">
         {Array.from({ length: SKELETON_COUNT }, (_, index) => (
           <li

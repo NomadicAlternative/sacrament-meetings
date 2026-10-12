@@ -1,8 +1,10 @@
 export default function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className="mt-auto border-t border-border bg-card">
       <div className="mx-auto w-full max-w-4xl px-6 py-5 text-sm text-muted">
-        <p>Sacrament Meeting Planner &mdash; WDD 430</p>
+        <p>&copy; {year} | Developed by Nomadic Alternative</p>
       </div>
     </footer>
   );
