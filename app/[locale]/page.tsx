@@ -15,7 +15,7 @@ export default async function Home({
   return (
     <div className="mx-auto w-full max-w-4xl">
       <section className="grid w-full items-center gap-10 bg-gradient-to-br from-accent/10 to-background px-6 py-12 sm:grid-cols-[1fr_auto]">
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 text-center sm:text-left">
           <h1 className="text-3xl font-semibold tracking-tight">
             {dict['home.title']}
           </h1>

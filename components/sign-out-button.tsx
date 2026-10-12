@@ -21,7 +21,7 @@ export function SignOutButton({
     >
       <button
         type="submit"
-        className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors duration-150 hover:bg-foreground/5 hover:text-foreground"
+        className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
       >
         {dict['header.signOut']}
       </button>

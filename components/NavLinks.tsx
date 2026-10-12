@@ -57,8 +57,8 @@ export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
                 aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'block whitespace-nowrap rounded-md bg-accent px-3 py-2 text-sm font-medium text-accent-foreground transition-colors duration-150'
-                    : 'block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-muted transition-colors duration-150 hover:bg-foreground/5 hover:text-foreground'
+                    ? 'block whitespace-nowrap rounded-md bg-white px-3 py-2 text-sm font-semibold text-accent shadow-sm transition-colors duration-150'
+                    : 'block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
                 }
               >
                 {label}

@@ -16,7 +16,7 @@
   "header.language": "Idioma",
 
   "install.install": "Instalar",
-  "install.title": "Instale o app",
+  "install.title": "Baixe o app",
   "install.onGooglePlay": "Baixe no",
   "install.googlePlay": "Google Play",
   "install.onAppStore": "Baixe na",
@@ -24,7 +24,7 @@
   "install.iosSteps": "iPhone (Safari):\n1. Abra o app no Safari.\n2. Toque em Compartilhar (📤).\n3. Escolha «Adicionar à Tela de Início».\n4. Confirme com «Adicionar».",
 
   "home.title": "Planejador de Reuniões Sacramentais",
-  "home.subtitle": "Ajuda os bispados e líderes de ramo a planejar e revisar as agendas das reuniões, e permite aos membros ver e imprimir os programas das semanas atuais e passadas.",
+  "home.subtitle": "Planeje e consulte os programas das reuniões sacramentais da Rama Elda.",
   "home.viewMeetings": "Ver reuniões",
   "home.thisSunday": "Programa deste domingo",
   "home.createMeeting": "Criar reunião",
