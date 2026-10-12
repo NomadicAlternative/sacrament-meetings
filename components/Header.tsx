@@ -7,12 +7,11 @@ import { getLocaleTag } from '@/lib/format';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
 // Encabezado global: nombre de la rama, fecha actual y estado de sesion.
-// Fondo azul con degradado, texto blanco y sombra para separarlo del contenido.
+// Fondo azul con degradado, texto blanco y sombra.
 //
-// Es un Server Component a proposito: lee la sesion con auth() y calcula la
-// fecha en el servidor. Si esta fecha se calculara en un Client Component, el
-// HTML del servidor y el del navegador podrian no coincidir (desajuste de
-// hidratacion: el server puede estar en otra zona horaria).
+// En movil la fecha se muestra corta (sin dia de la semana ni año) debajo del
+// nombre, para que el header no ocupe mas renglones de los necesarios. En
+// escritorio la fecha completa va junto al selector y la sesion.
 export default async function Header({
   locale,
   dict,
@@ -22,22 +21,27 @@ export default async function Header({
 }) {
   const session = await auth();
   const user = session?.user;
-  const today = new Date().toLocaleDateString(getLocaleTag(locale), {
+
+  const fullDate = new Date().toLocaleDateString(getLocaleTag(locale), {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+  const shortDate = new Date().toLocaleDateString(getLocaleTag(locale), {
+    day: 'numeric',
+    month: 'long',
+  });
 
   return (
     <header className="bg-gradient-to-br from-[#1f4b88] to-[#163a66] text-white shadow-md">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 py-5">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xl font-semibold tracking-tight">
+      <div className="mx-auto w-full max-w-4xl px-6 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-lg font-semibold tracking-tight sm:text-xl">
             {dict['brand.name']}
           </p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            <p className="text-sm text-white/70">{today}</p>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <p className="hidden text-sm text-white/70 sm:inline">{fullDate}</p>
             <LanguageSwitcher />
             {user ? (
               <div className="flex items-center gap-1">
@@ -49,14 +53,22 @@ export default async function Header({
             ) : (
               <Link
                 href={`/${locale}/login`}
-                className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
+                className="block whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white sm:px-3"
               >
                 {dict['header.signIn']}
               </Link>
             )}
           </div>
         </div>
-        <NavLinks isLoggedIn={!!user} />
+
+        {/* Fecha corta, solo en movil. */}
+        <div className="mt-1.5 sm:hidden">
+          <p className="text-sm text-white/70">{shortDate}</p>
+        </div>
+
+        <div className="mt-3">
+          <NavLinks isLoggedIn={!!user} />
+        </div>
       </div>
     </header>
   );
