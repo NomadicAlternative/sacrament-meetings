@@ -64,7 +64,7 @@ export function InstallBadges() {
   }
 
   const badgeClass =
-    'flex items-center gap-3 rounded-lg bg-accent px-4 py-2 text-left text-white shadow-md transition hover:opacity-90';
+    'flex items-center gap-3 rounded-lg bg-accent px-5 py-2.5 text-left text-white shadow-md transition hover:opacity-90';
 
   return (
     <div className="flex flex-col items-center gap-4">

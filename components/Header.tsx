@@ -31,12 +31,12 @@ export default async function Header({
 
   return (
     <header className="bg-gradient-to-br from-[#1f4b88] to-[#163a66] text-white shadow-md">
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-3 px-6 py-5">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-6 py-5">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-lg font-semibold tracking-tight">
+          <p className="text-xl font-semibold tracking-tight">
             {dict['brand.name']}
           </p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <p className="text-sm text-white/70">{today}</p>
             <LanguageSwitcher />
             {user ? (

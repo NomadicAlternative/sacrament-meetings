@@ -12,33 +12,29 @@ export default async function Home({
   const loc: Locale = isLocale(locale) ? locale : 'es';
   const dict = getDictionary(loc);
 
+  const primaryButton =
+    'inline-flex h-11 items-center justify-center rounded-lg bg-accent px-5 text-sm font-semibold text-accent-foreground shadow-md transition duration-150 ease-out hover:opacity-90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+  const secondaryButton =
+    'inline-flex h-11 items-center justify-center rounded-lg border border-border bg-card px-5 text-sm font-medium transition duration-150 ease-out hover:border-accent hover:text-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
+
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <section className="grid w-full items-center gap-10 bg-gradient-to-br from-accent/10 to-background px-6 py-12 sm:grid-cols-[1fr_auto]">
+      <section className="grid w-full items-center gap-10 bg-gradient-to-br from-accent/10 to-background px-6 py-12 sm:grid-cols-[1fr_auto] sm:gap-14 sm:py-16">
         <div className="flex flex-col gap-5 text-center sm:text-left">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             {dict['home.title']}
           </h1>
-          <p className="max-w-prose text-base text-muted">
+          <p className="max-w-prose text-base leading-relaxed text-muted">
             {dict['home.subtitle']}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
-              href={`/${loc}/meetings`}
-              className="rounded-md bg-accent px-4 py-2 text-center text-sm font-medium text-accent-foreground shadow-sm transition duration-150 ease-out hover:opacity-90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
+            <Link href={`/${loc}/meetings`} className={primaryButton}>
               {dict['home.viewMeetings']}
             </Link>
-            <Link
-              href={`/${loc}/meetings/current`}
-              className="rounded-md border border-border px-4 py-2 text-center text-sm font-medium transition duration-150 ease-out hover:border-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
+            <Link href={`/${loc}/meetings/current`} className={secondaryButton}>
               {dict['home.thisSunday']}
             </Link>
-            <Link
-              href={`/${loc}/meetings/new`}
-              className="rounded-md border border-border px-4 py-2 text-center text-sm font-medium transition duration-150 ease-out hover:border-accent active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
+            <Link href={`/${loc}/meetings/new`} className={secondaryButton}>
               {dict['home.createMeeting']}
             </Link>
           </div>
@@ -53,12 +49,12 @@ export default async function Home({
           width={640}
           height={640}
           priority
-          className="mx-auto h-auto w-48 rounded-2xl shadow-md sm:w-56"
+          className="mx-auto h-auto w-40 rounded-2xl shadow-lg ring-1 ring-black/5 sm:w-52"
         />
       </section>
 
-      <section className="flex flex-col items-center gap-4 border-t border-border px-6 py-10">
-        <h2 className="text-lg font-semibold tracking-tight">
+      <section className="flex flex-col items-center gap-5 border-t border-border px-6 py-12 sm:py-16">
+        <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">
           {dict['install.title']}
         </h2>
         <InstallBadges />

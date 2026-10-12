@@ -45,7 +45,7 @@ export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
 
   return (
     <nav aria-label={t('nav.main')} className="-mx-1 px-1">
-      <ul className="flex items-center gap-1 overflow-x-auto">
+      <ul className="flex items-center gap-1.5 overflow-x-auto">
         {visibleLinks.map(({ path, label }) => {
           const active = isActive(localPath, path);
           return (
@@ -57,8 +57,8 @@ export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
                 aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'block whitespace-nowrap rounded-md bg-white px-3 py-2 text-sm font-semibold text-accent shadow-sm transition-colors duration-150'
-                    : 'block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
+                    ? 'block whitespace-nowrap rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-accent shadow-sm transition-colors duration-150'
+                    : 'block whitespace-nowrap rounded-md px-3.5 py-2 text-sm font-medium text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
                 }
               >
                 {label}
