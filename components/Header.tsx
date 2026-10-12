@@ -3,7 +3,6 @@ import { auth } from '@/auth';
 import NavLinks from '@/components/NavLinks';
 import { SignOutButton } from '@/components/sign-out-button';
 import { LanguageSwitcher } from '@/components/language-switcher';
-import { InstallButton } from '@/components/install-button';
 import { getLocaleTag } from '@/lib/format';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
@@ -39,7 +38,6 @@ export default async function Header({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <p className="text-sm text-muted">{today}</p>
             <LanguageSwitcher />
-            <InstallButton />
             {user ? (
               <div className="flex items-center gap-1">
                 <span className="hidden text-xs text-muted md:inline">
