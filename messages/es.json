@@ -17,9 +17,9 @@
 
   "install.install": "Instalar",
   "install.title": "Instalá la app",
-  "install.onGooglePlay": "Disponible en",
+  "install.onGooglePlay": "Conseguila en",
   "install.googlePlay": "Google Play",
-  "install.onAppStore": "Descargar en",
+  "install.onAppStore": "Descargala en",
   "install.appStore": "App Store",
   "install.iosSteps": "iPhone (Safari):\n1. Abrí la app en Safari.\n2. Tocá Compartir (📤).\n3. Elegí «Agregar a inicio».\n4. Confirmá con «Agregar».",
 

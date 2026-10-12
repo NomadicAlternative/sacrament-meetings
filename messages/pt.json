@@ -17,9 +17,9 @@
 
   "install.install": "Instalar",
   "install.title": "Instale o app",
-  "install.onGooglePlay": "Disponível no",
+  "install.onGooglePlay": "Baixe no",
   "install.googlePlay": "Google Play",
-  "install.onAppStore": "Baixar na",
+  "install.onAppStore": "Baixe na",
   "install.appStore": "App Store",
   "install.iosSteps": "iPhone (Safari):\n1. Abra o app no Safari.\n2. Toque em Compartilhar (📤).\n3. Escolha «Adicionar à Tela de Início».\n4. Confirme com «Adicionar».",
 

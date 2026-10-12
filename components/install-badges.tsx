@@ -12,23 +12,13 @@ interface BeforeInstallPromptEvent extends Event {
 
 function PlayIcon() {
   return (
-    <svg viewBox="0 0 24 24" className="h-7 w-7 shrink-0" aria-hidden="true">
-      <path
-        fill="#00d7fe"
-        d="M3.6 2.7c-.2.1-.3.4-.3.7v17.2c0 .3.1.6.3.7l9.9-9.3L3.6 2.7z"
-      />
-      <path
-        fill="#00f076"
-        d="M13.6 12 3.6 21.3 10 8.9l3.6 3.1z"
-      />
-      <path
-        fill="#ff3a44"
-        d="M17.7 8.6 13.6 12l3.6 3.3 3.5-2c.7-.4.7-1.3 0-1.8L17.7 8.6z"
-      />
-      <path
-        fill="#f3b300"
-        d="M5 1.7 13.6 12 4.5 22.3l13.2-13.7L6.4 1.7H5z"
-      />
+    <svg
+      viewBox="0 0 24 24"
+      className="h-7 w-7 shrink-0"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M4 3.5v17c0 .8.9 1.3 1.6.9l14.6-8.5c.7-.4.7-1.4 0-1.8L5.6 2.6C4.9 2.2 4 2.7 4 3.5z" />
     </svg>
   );
 }
@@ -74,7 +64,7 @@ export function InstallBadges() {
   }
 
   const badgeClass =
-    'flex items-center gap-3 rounded-lg border border-white/20 bg-black px-4 py-2 text-left text-white transition hover:opacity-90';
+    'flex items-center gap-3 rounded-lg bg-accent px-4 py-2 text-left text-white shadow-md transition hover:opacity-90';
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -86,7 +76,7 @@ export function InstallBadges() {
         >
           <PlayIcon />
           <span className="flex flex-col leading-tight">
-            <span className="text-[10px] uppercase tracking-wide text-white/70">
+            <span className="text-[10px] uppercase tracking-wide text-white/80">
               {t('install.onGooglePlay')}
             </span>
             <span className="text-lg font-semibold">
@@ -102,7 +92,7 @@ export function InstallBadges() {
         >
           <AppleIcon />
           <span className="flex flex-col leading-tight">
-            <span className="text-[10px] uppercase tracking-wide text-white/70">
+            <span className="text-[10px] uppercase tracking-wide text-white/80">
               {t('install.onAppStore')}
             </span>
             <span className="text-lg font-semibold">{t('install.appStore')}</span>
