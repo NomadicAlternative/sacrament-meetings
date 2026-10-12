@@ -49,7 +49,7 @@ export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
         {visibleLinks.map(({ path, label }) => {
           const active = isActive(localPath, path);
           return (
-            <li key={path}>
+            <li key={path} className="flex items-center">
               <Link
                 href={`/${locale}${path === '/' ? '' : path}`}
                 // aria-current le dice al lector de pantalla cual es la pagina
@@ -57,8 +57,8 @@ export default function NavLinks({ isLoggedIn }: { isLoggedIn: boolean }) {
                 aria-current={active ? 'page' : undefined}
                 className={
                   active
-                    ? 'block whitespace-nowrap rounded-md bg-white px-3.5 py-2 text-sm font-semibold text-accent shadow-sm transition-colors duration-150'
-                    : 'block whitespace-nowrap rounded-md px-3.5 py-2 text-sm font-medium text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
+                    ? 'inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md bg-white px-3.5 text-sm font-semibold text-accent shadow-sm transition-colors duration-150'
+                    : 'inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md px-3.5 text-sm font-medium text-white/70 transition-colors duration-150 hover:bg-white/10 hover:text-white'
                 }
               >
                 {label}
