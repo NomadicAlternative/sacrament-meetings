@@ -63,7 +63,7 @@ export default function NavLinks({
           const active = isActive(localPath, path);
           const base = vertical
             ? 'flex h-10 w-full items-center rounded-md px-3.5 text-sm '
-            : 'inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md px-3.5 text-sm ';
+            : 'inline-flex h-7 items-center justify-center whitespace-nowrap rounded-md px-3 text-sm ';
           const state = active
             ? 'bg-white font-semibold text-accent shadow-sm'
             : 'font-medium text-white/70 hover:bg-white/10 hover:text-white';

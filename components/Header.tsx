@@ -28,7 +28,7 @@ export default async function Header({
   const pendingCount = isPresident ? await countPendingRequests() : 0;
 
   return (
-    <header className="bg-gradient-to-br from-[#1f4b88] to-[#163a66] text-white shadow-md">
+    <header className="bg-gradient-to-br from-[#1f4b88] to-[#163a66] text-white shadow-[0_2px_6px_rgba(0,0,0,0.12)]">
       <div className="mx-auto w-full max-w-4xl px-6 py-4">
         <div className="flex items-center justify-between gap-3">
           <p className="text-lg font-semibold tracking-tight sm:text-xl">
@@ -74,6 +74,8 @@ export default async function Header({
           )}
         </div>
       </div>
+      {/* Linea naranja sutil que se difumina hacia abajo. */}
+      <div className="h-1.5 w-full bg-gradient-to-b from-accent-warm to-transparent" />
     </header>
   );
 }
