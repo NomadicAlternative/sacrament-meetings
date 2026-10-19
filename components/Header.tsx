@@ -4,7 +4,9 @@ import NavLinks from '@/components/NavLinks';
 import { SignOutButton } from '@/components/sign-out-button';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LogInIcon } from '@/components/icons';
+import { NotificationBell } from '@/components/notifications-bell';
 import { getLocaleTag } from '@/lib/format';
+import { countPendingRequests } from '@/lib/users';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
 // Encabezado global: nombre de la rama, fecha actual y estado de sesion.
@@ -22,6 +24,11 @@ export default async function Header({
 }) {
   const session = await auth();
   const user = session?.user;
+
+  // Only the president sees the requests bell; its badge counts the pending
+  // access requests waiting for approval.
+  const isPresident = user?.role === 'president';
+  const pendingCount = isPresident ? await countPendingRequests() : 0;
 
   const fullDate = new Date().toLocaleDateString(getLocaleTag(locale), {
     weekday: 'long',
@@ -43,6 +50,13 @@ export default async function Header({
           </p>
           <div className="flex items-center gap-2 sm:gap-3">
             <p className="hidden text-sm text-white/70 sm:inline">{fullDate}</p>
+            {isPresident ? (
+              <NotificationBell
+                locale={locale}
+                count={pendingCount}
+                label={dict['header.requests']}
+              />
+            ) : null}
             <LanguageSwitcher />
             {user ? (
               <div className="flex items-center gap-1">

@@ -9,6 +9,7 @@ import { signIn } from '@/auth';
 import {
   requireHymnEditorSession,
   requireLeaderSession,
+  requirePresidentSession,
 } from '@/lib/auth-guards';
 import {
   MeetingFormSchema,
@@ -21,10 +22,16 @@ import {
   updateMeeting as updateMeetingRow,
   deleteMeeting as deleteMeetingRow,
 } from '@/lib/meetings-db';
-import { createMembershipRequest, getUserByEmail } from '@/lib/users';
+import {
+  approveRequest,
+  createMembershipRequest,
+  getUserByEmail,
+  rejectRequest,
+} from '@/lib/users';
 import type { Locale } from '@/lib/i18n';
 import { isFirstSundayOfMonth } from '@/lib/format';
 import {
+  ALL_ROLES,
   REQUESTABLE_ROLES,
   type Hymn,
   type MeetingType,
@@ -401,4 +408,40 @@ export async function updateHymns(
 
   revalidatePath(`/${locale}/meetings`);
   redirect(`/${locale}/meetings/hymns`);
+}
+
+// Approves a membership request. The president may override the requested role
+// here, so a self-assigned "president" role never slips through by accident.
+export async function approveRequestAction(formData: FormData): Promise<void> {
+  const session = await requirePresidentSession();
+  const approverId = session.user.userId;
+  if (approverId == null) return;
+
+  const id = Number(formData.get('id'));
+  const roleRaw = String(formData.get('role') || '');
+  const locale = String(formData.get('locale') || 'es');
+
+  // Only assign a known role; anything else is rejected defensively.
+  if (!(ALL_ROLES as readonly string[]).includes(roleRaw)) return;
+  const role = roleRaw as Role;
+
+  await approveRequest(id, role, approverId);
+
+  revalidatePath(`/${locale}/admin/requests`);
+  redirect(`/${locale}/admin/requests`);
+}
+
+// Rejects a membership request.
+export async function rejectRequestAction(formData: FormData): Promise<void> {
+  const session = await requirePresidentSession();
+  const approverId = session.user.userId;
+  if (approverId == null) return;
+
+  const id = Number(formData.get('id'));
+  const locale = String(formData.get('locale') || 'es');
+
+  await rejectRequest(id, approverId);
+
+  revalidatePath(`/${locale}/admin/requests`);
+  redirect(`/${locale}/admin/requests`);
 }

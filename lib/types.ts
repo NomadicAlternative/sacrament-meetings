@@ -73,3 +73,12 @@ export const REQUESTABLE_ROLES = [
   'secretary',
   'music_director',
 ] as const;
+
+// Every role, including the president, for the approval form's role selector.
+export const ALL_ROLES = [
+  'president',
+  'first_counselor',
+  'second_counselor',
+  'secretary',
+  'music_director',
+] as const;
