@@ -1,15 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import NavLinks from '@/components/NavLinks';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useLocale } from '@/components/locale-provider';
 
-// Menu hamburguesa para movil, solo para lideres (presidente, consejeros,
-// secretario). Se abre como un drawer que entra de derecha a izquierda con
-// ease-out (rapido al inicio, se frena al final).
+function isActive(localPath: string, path: string): boolean {
+  if (path === '/') return localPath === '/';
+  if (path === '/meetings') {
+    return localPath === '/meetings' || /^\/meetings\/\d+$/.test(localPath);
+  }
+  return localPath === path;
+}
+
+// Menu hamburguesa para lideres (presidente, consejeros, secretario), a la
+// derecha. Drawer lateral con glassmorphism: entra de derecha a izquierda con
+// ease-out y los links aparecen en cascada (stagger). El icono se anima de
+// hamburguesa a X.
 export function MobileNav() {
   const [open, setOpen] = useState(false);
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
+  const pathname = usePathname();
+  const localPath = pathname.replace(/^\/(es|pt)(?=\/|$)/, '') || '/';
+
+  const links = [
+    { path: '/', label: t('nav.home') },
+    { path: '/meetings', label: t('nav.meetings') },
+    { path: '/meetings/current', label: t('nav.current') },
+    { path: '/meetings/new', label: t('nav.create') },
+  ];
 
   return (
     <div className="sm:hidden">
@@ -31,9 +50,33 @@ export function MobileNav() {
           aria-hidden="true"
           className="h-5 w-5"
         >
-          <line x1="4" x2="20" y1="6" y2="6" />
-          <line x1="4" x2="20" y1="12" y2="12" />
-          <line x1="4" x2="20" y1="18" y2="18" />
+          <line
+            x1="4"
+            x2="20"
+            y1="6"
+            y2="6"
+            className={`origin-center transition-all duration-300 ${
+              open ? 'translate-y-[6px] rotate-45' : ''
+            }`}
+          />
+          <line
+            x1="4"
+            x2="20"
+            y1="12"
+            y2="12"
+            className={`transition-opacity duration-300 ${
+              open ? 'opacity-0' : 'opacity-100'
+            }`}
+          />
+          <line
+            x1="4"
+            x2="20"
+            y1="18"
+            y2="18"
+            className={`origin-center transition-all duration-300 ${
+              open ? '-translate-y-[6px] -rotate-45' : ''
+            }`}
+          />
         </svg>
       </button>
 
@@ -45,17 +88,21 @@ export function MobileNav() {
         aria-hidden={!open}
       >
         <div
-          className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
             open ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setOpen(false)}
         />
+
         <div
-          className={`absolute right-0 top-0 flex h-full w-64 max-w-[80%] flex-col bg-slate-900 p-4 shadow-xl transition-transform duration-300 ease-out ${
+          className={`absolute right-0 top-0 flex h-full w-72 max-w-[85%] flex-col bg-slate-900/90 p-5 shadow-2xl backdrop-blur-md transition-transform duration-300 ease-out ${
             open ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="mb-2 flex justify-end">
+          <div className="mb-5 flex items-center justify-between">
+            <span className="text-sm font-semibold tracking-tight text-white/90">
+              {t('nav.main')}
+            </span>
             <button
               type="button"
               onClick={() => setOpen(false)}
@@ -77,9 +124,32 @@ export function MobileNav() {
               </svg>
             </button>
           </div>
-          <div onClick={() => setOpen(false)}>
-            <NavLinks isLeader vertical />
-          </div>
+
+          <nav className="flex flex-col gap-1.5">
+            {links.map((link, index) => {
+              const active = isActive(localPath, link.path);
+              return (
+                <Link
+                  key={link.path}
+                  href={`/${locale}${link.path === '/' ? '' : link.path}`}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex h-11 items-center rounded-lg px-4 text-base font-medium transition-all duration-300 ${
+                    open ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+                  } ${
+                    active
+                      ? 'bg-white text-accent'
+                      : 'text-white/85 hover:bg-white/10 hover:text-white'
+                  }`}
+                  style={{
+                    transitionDelay: open ? `${120 + index * 50}ms` : '0ms',
+                  }}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+          </nav>
         </div>
       </div>
     </div>

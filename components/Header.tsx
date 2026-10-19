@@ -52,6 +52,7 @@ export default async function Header({
           </p>
           <div className="flex items-center gap-2 sm:gap-3">
             <p className="hidden text-sm text-white/70 sm:inline">{fullDate}</p>
+            {isLeader(user?.role) ? <MobileNav /> : null}
             {isPresident ? (
               <NotificationBell
                 locale={locale}
@@ -87,12 +88,9 @@ export default async function Header({
 
         <div className="mt-3">
           {isLeader(user?.role) ? (
-            <>
-              <div className="hidden sm:block">
-                <NavLinks isLeader />
-              </div>
-              <MobileNav />
-            </>
+            <div className="hidden sm:block">
+              <NavLinks isLeader />
+            </div>
           ) : (
             <NavLinks isLeader={false} />
           )}
