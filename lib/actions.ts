@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { AuthError } from 'next-auth';
+import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import { signIn } from '@/auth';
 import { requireLeaderSession } from '@/lib/auth-guards';
 import {
@@ -15,13 +17,16 @@ import {
   updateMeeting as updateMeetingRow,
   deleteMeeting as deleteMeetingRow,
 } from '@/lib/meetings-db';
+import { createMembershipRequest, getUserByEmail } from '@/lib/users';
 import type { Locale } from '@/lib/i18n';
-import type {
-  Hymn,
-  MeetingType,
-  SacramentMeeting,
-  SpeakerItem,
-  WardBusinessItem,
+import {
+  REQUESTABLE_ROLES,
+  type Hymn,
+  type MeetingType,
+  type Role,
+  type SacramentMeeting,
+  type SpeakerItem,
+  type WardBusinessItem,
 } from '@/lib/types';
 
 // Turns each non-empty line into a WardBusinessItem. Blank lines are ignored.
@@ -217,25 +222,92 @@ export async function deleteMeeting(formData: FormData): Promise<void> {
   redirect(`/${locale}/meetings`);
 }
 
+// Result of the credentials sign-in attempt. `status` drives the client:
+// not_registered opens the request modal, pending/rejected show the matching
+// message, and `error` shows a credentials error.
+export type LoginState = {
+  status?: 'pending' | 'rejected' | 'not_registered';
+  email?: string;
+  error?: 'credentials' | 'generic';
+};
+
 // Sign-in Server Action consumed by the login form via useActionState.
 // signIn throws a redirect on success, so it must not be swallowed here.
-// The form includes a hidden `callbackUrl` so the user lands on the localized
-// meetings list after signing in.
+// Before signing in it checks the membership state, so a first-time email can
+// be routed to the request modal instead of Auth.js's generic credentials error.
 export async function authenticate(
-  prevState: string | undefined,
+  prevState: LoginState,
   formData: FormData,
-): Promise<string | undefined> {
+): Promise<LoginState> {
+  const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const existing = await getUserByEmail(email);
+
+  if (!existing) {
+    return { status: 'not_registered', email };
+  }
+  if (existing.status === 'pending') {
+    return { status: 'pending' };
+  }
+  if (existing.status === 'rejected') {
+    return { status: 'rejected' };
+  }
+
   try {
     await signIn('credentials', formData);
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':
-          return 'Invalid email or password.';
+          return { error: 'credentials' };
         default:
-          return 'Something went wrong.';
+          return { error: 'generic' };
       }
     }
     throw error; // re-throw so Next.js handles the redirect correctly
   }
+
+  return {};
+}
+
+const RequestAccessSchema = z.object({
+  name: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(REQUESTABLE_ROLES),
+  password: z.string().optional(),
+});
+
+export type RequestAccessState = {
+  errors?: Record<string, string[]>;
+  sent?: boolean;
+};
+
+// Creates a pending membership request. A password is optional: OAuth users
+// have none; credentials users provide one so they can sign in later.
+export async function requestAccess(
+  prevState: RequestAccessState,
+  formData: FormData,
+): Promise<RequestAccessState> {
+  const name = String(formData.get('name') ?? '').trim();
+  const email = String(formData.get('email') ?? '').trim().toLowerCase();
+  const role = String(formData.get('role') ?? '') as Role;
+  const password = String(formData.get('password') ?? '');
+
+  const parsed = RequestAccessSchema.safeParse({ name, email, role, password });
+
+  if (!parsed.success) {
+    return { errors: parsed.error.flatten().fieldErrors };
+  }
+
+  const passwordHash = password.length > 0
+    ? await bcrypt.hash(password, 10)
+    : null;
+
+  await createMembershipRequest({
+    email,
+    name,
+    role: parsed.data.role,
+    passwordHash,
+  });
+
+  return { sent: true };
 }

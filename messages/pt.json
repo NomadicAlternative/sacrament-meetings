@@ -93,6 +93,12 @@
   "login.password": "Senha",
   "login.signingIn": "Entrando...",
   "login.signIn": "Entrar",
+  "login.google": "Continuar com o Google",
+  "login.microsoft": "Continuar com a Microsoft",
+  "login.or": "ou",
+  "login.credentialsError": "E-mail ou senha incorretos.",
+  "login.statusPending": "Sua solicitação está pendente de aprovação do Presidente.",
+  "login.statusRejected": "Sua solicitação de acesso foi rejeitada.",
 
   "pagination.label": "Paginação",
   "pagination.previous": "Anterior",
@@ -117,5 +123,25 @@
   "type.regular": "Regular",
   "type.stake": "Estaca",
   "type.general": "Geral",
-  "type.special": "Especial"
+  "type.special": "Especial",
+
+  "roles.president": "Presidente do Ramo",
+  "roles.first_counselor": "Primeiro Conselheiro",
+  "roles.second_counselor": "Segundo Conselheiro",
+  "roles.secretary": "Secretário",
+  "roles.music_director": "Diretora de Música",
+
+  "request.title": "Solicitar acesso",
+  "request.subtitle": "Somente membros da presidência ou responsável pela música podem se registrar.",
+  "request.explanation": "Uma solicitação será enviada ao Presidente do Ramo para aprovação.",
+  "request.name": "Nome",
+  "request.email": "E-mail",
+  "request.password": "Senha",
+  "request.passwordHint": "Você a usará para entrar.",
+  "request.role": "Função",
+  "request.selectRole": "Selecione sua função",
+  "request.submit": "Enviar solicitação",
+  "request.sending": "Enviando...",
+  "request.sent": "Solicitação enviada. Aguarde a aprovação do Presidente.",
+  "request.close": "Fechar"
 }

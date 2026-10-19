@@ -64,3 +64,12 @@ export interface SacramentMeeting {
   closingHymn: Hymn;
   closingPrayer: string;
 }
+
+// Roles a member can request. The president role is not requestable: it is
+// bootstrapped once, and only the president can approve/assign roles.
+export const REQUESTABLE_ROLES = [
+  'first_counselor',
+  'second_counselor',
+  'secretary',
+  'music_director',
+] as const;
