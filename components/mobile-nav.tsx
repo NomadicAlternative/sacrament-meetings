@@ -88,14 +88,14 @@ export function MobileNav() {
         aria-hidden={!open}
       >
         <div
-          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-500 ${
             open ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setOpen(false)}
         />
 
         <div
-          className={`absolute right-0 top-0 flex h-full w-72 max-w-[85%] flex-col bg-slate-900/90 p-5 shadow-2xl backdrop-blur-md transition-transform duration-300 ease-out ${
+          className={`absolute right-0 top-0 flex h-full w-72 max-w-[85%] flex-col bg-slate-900/90 p-5 shadow-2xl backdrop-blur-md transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             open ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
@@ -134,7 +134,7 @@ export function MobileNav() {
                   href={`/${locale}${link.path === '/' ? '' : link.path}`}
                   onClick={() => setOpen(false)}
                   aria-current={active ? 'page' : undefined}
-                  className={`flex h-11 items-center rounded-lg px-4 text-base font-medium transition-all duration-300 ${
+                  className={`flex h-11 items-center rounded-lg px-4 text-base font-medium transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                     open ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
                   } ${
                     active
@@ -142,7 +142,7 @@ export function MobileNav() {
                       : 'text-white/85 hover:bg-white/10 hover:text-white'
                   }`}
                   style={{
-                    transitionDelay: open ? `${120 + index * 50}ms` : '0ms',
+                    transitionDelay: open ? `${150 + index * 60}ms` : '0ms',
                   }}
                 >
                   {link.label}

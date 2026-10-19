@@ -60,7 +60,7 @@ export default async function Header({
                 label={dict['header.requests']}
               />
             ) : null}
-            <LanguageSwitcher />
+            {!isPresident ? <LanguageSwitcher /> : null}
             {user ? (
               <div className="flex items-center gap-1">
                 <span className="hidden text-xs text-white/70 md:inline">
