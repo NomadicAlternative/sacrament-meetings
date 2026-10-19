@@ -86,10 +86,16 @@ export default async function Header({
         </div>
 
         <div className="mt-3">
-          <div className="hidden sm:block">
-            <NavLinks isLeader={isLeader(user?.role)} />
-          </div>
-          {isLeader(user?.role) ? <MobileNav /> : null}
+          {isLeader(user?.role) ? (
+            <>
+              <div className="hidden sm:block">
+                <NavLinks isLeader />
+              </div>
+              <MobileNav />
+            </>
+          ) : (
+            <NavLinks isLeader={false} />
+          )}
         </div>
       </div>
     </header>

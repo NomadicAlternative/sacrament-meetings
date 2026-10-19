@@ -48,7 +48,7 @@ function AgendaItem({
 }) {
   return (
     <div className="border-b border-border/60 py-2.5 last:border-0">
-      <dt className="text-[11px] font-bold uppercase tracking-wider text-foreground">
+      <dt className="text-[11px] font-bold uppercase tracking-wider text-accent-warm">
         {label}
       </dt>
       <dd className="mt-0.5 text-sm">{children}</dd>

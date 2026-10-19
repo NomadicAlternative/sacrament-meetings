@@ -7,11 +7,11 @@
   --background: #f8fafc;
   --foreground: #0f172a;
   --card: #ffffff;
-  --border: #f0c9ae;
+  --border: #e2e8f0;
   --muted: #64748b;
   --accent: #1f4b88;
   --accent-foreground: #ffffff;
-  --accent-warm: #e36414;
+  --accent-warm: #ea580c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,7 +19,7 @@
     --background: #0f172a;
     --foreground: #e2e8f0;
     --card: #1e293b;
-    --border: #7a4b2b;
+    --border: #334155;
     --muted: #94a3b8;
     --accent: #8fb3df;
     --accent-foreground: #0f172a;
