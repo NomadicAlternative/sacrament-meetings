@@ -20,6 +20,7 @@ import {
 } from '@/lib/meeting-form-schema';
 import {
   addMeeting,
+  getMeetingByDate,
   updateMeeting as updateMeetingRow,
   deleteMeeting as deleteMeetingRow,
 } from '@/lib/meetings-db';
@@ -179,6 +180,16 @@ export async function createMeeting(
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Please correct the fields highlighted below.',
+    };
+  }
+
+  // Una reunion por fecha (UNIQUE). Si ya existe, guiar a editar en lugar de
+  // fallar con un 503 opaco por duplicate key.
+  const existing = await getMeetingByDate(validatedFields.data.date);
+  if (existing) {
+    return {
+      message:
+        'Ya existe una reunión para esa fecha. Edítala en lugar de crear una nueva.',
     };
   }
 
