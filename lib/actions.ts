@@ -3,7 +3,8 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { AuthError } from 'next-auth';
-import { auth, signIn } from '@/auth';
+import { signIn } from '@/auth';
+import { requireLeaderSession } from '@/lib/auth-guards';
 import {
   MeetingFormSchema,
   type MeetingFormInput,
@@ -16,6 +17,7 @@ import {
 } from '@/lib/meetings-db';
 import type { Locale } from '@/lib/i18n';
 import type {
+  Hymn,
   MeetingType,
   SacramentMeeting,
   SpeakerItem,
@@ -82,6 +84,8 @@ function formDataToInput(formData: FormData) {
     openingPrayer: formData.get('openingPrayer'),
     sacramentHymnNumber: formData.get('sacramentHymnNumber'),
     sacramentHymnTitle: formData.get('sacramentHymnTitle'),
+    intermediateHymnNumber: formData.get('intermediateHymnNumber'),
+    intermediateHymnTitle: formData.get('intermediateHymnTitle'),
     closingHymnNumber: formData.get('closingHymnNumber'),
     closingHymnTitle: formData.get('closingHymnTitle'),
     closingPrayer: formData.get('closingPrayer'),
@@ -90,6 +94,17 @@ function formDataToInput(formData: FormData) {
     wardBusiness: formData.get('wardBusiness'),
     speakers: formData.get('speakers'),
   };
+}
+
+// The intermediate hymn only exists when a title was actually entered. The
+// first Sunday of the month omits the field entirely, so an absent title means
+// "no intermediate hymn" and maps to undefined.
+function buildOptionalHymn(
+  number: number | undefined,
+  title: string | undefined,
+): Hymn | undefined {
+  if (!title || title.trim().length === 0) return undefined;
+  return { number: number ?? 0, title };
 }
 
 // Transforms the validated flat fields into the stored SacramentMeeting shape.
@@ -111,6 +126,10 @@ function buildMeeting(data: MeetingFormInput): Omit<SacramentMeeting, 'id'> {
       number: data.sacramentHymnNumber,
       title: data.sacramentHymnTitle,
     },
+    intermediateHymn: buildOptionalHymn(
+      data.intermediateHymnNumber,
+      data.intermediateHymnTitle,
+    ),
     speakers: parseSpeakers(data.speakers),
     closingHymn: {
       number: data.closingHymnNumber,
@@ -125,7 +144,7 @@ export async function createMeeting(
   prevState: MeetingFormState,
   formData: FormData,
 ): Promise<MeetingFormState> {
-  await requireOwnerSession();
+  await requireLeaderSession();
 
   const validatedFields = MeetingFormSchema.safeParse(formDataToInput(formData));
 
@@ -152,7 +171,7 @@ export async function updateMeeting(
   prevState: MeetingFormState,
   formData: FormData,
 ): Promise<MeetingFormState> {
-  await requireOwnerSession();
+  await requireLeaderSession();
 
   const validatedFields = MeetingFormSchema.safeParse(formDataToInput(formData));
 
@@ -181,7 +200,7 @@ export async function updateMeeting(
 }
 
 export async function deleteMeeting(formData: FormData): Promise<void> {
-  await requireOwnerSession();
+  await requireLeaderSession();
 
   const id = Number(formData.get('id'));
   const locale = (formData.get('locale') as string) || 'es';
@@ -196,15 +215,6 @@ export async function deleteMeeting(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/meetings`);
   redirect(`/${locale}/meetings`);
-}
-
-// Throws unless a bishopric member is signed in. The middleware already keeps
-// the admin pages behind a redirect, but this is defense in depth: a direct
-// POST to a Server Action must also be rejected, not just the page UI.
-async function requireOwnerSession() {
-  const session = await auth();
-  if (!session?.user) throw new Error('Not authenticated');
-  return session;
 }
 
 // Sign-in Server Action consumed by the login form via useActionState.

@@ -37,9 +37,14 @@ export default auth((req) => {
   const path = pathname.replace(/^\/(es|pt)/, '') || '/';
   const isLoggedIn = !!req.auth?.user;
 
-  // 2. Autorizacion: area de lider.
+  // 2. Autorizacion: area de lider. Solo exige sesion; la autorizacion fina
+  // por rol la hacen los Server Components y las Server Actions (defensa en
+  // profundidad), porque el middleware no expone los campos custom del token.
   const isProtected =
-    path.startsWith('/meetings/new') || /^\/meetings\/\d+\/edit$/.test(path);
+    path.startsWith('/meetings/new') ||
+    /^\/meetings\/\d+\/edit$/.test(path) ||
+    path.startsWith('/meetings/hymns') ||
+    path.startsWith('/admin/requests');
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL(`/${locale}/login`, nextUrl);
