@@ -6,17 +6,12 @@ import { SignOutButton } from '@/components/sign-out-button';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LogInIcon } from '@/components/icons';
 import { NotificationBell } from '@/components/notifications-bell';
-import { getLocaleTag } from '@/lib/format';
 import { isLeader } from '@/lib/auth-guards';
 import { countPendingRequests } from '@/lib/users';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
-// Encabezado global: nombre de la rama, fecha actual y estado de sesion.
+// Encabezado global: nombre de la rama y estado de sesion.
 // Fondo azul con degradado, texto blanco y sombra.
-//
-// En movil la fecha se muestra corta (sin dia de la semana ni año) debajo del
-// nombre, para que el header no ocupe mas renglones de los necesarios. En
-// escritorio la fecha completa va junto al selector y la sesion.
 export default async function Header({
   locale,
   dict,
@@ -32,17 +27,6 @@ export default async function Header({
   const isPresident = user?.role === 'president';
   const pendingCount = isPresident ? await countPendingRequests() : 0;
 
-  const fullDate = new Date().toLocaleDateString(getLocaleTag(locale), {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const shortDate = new Date().toLocaleDateString(getLocaleTag(locale), {
-    day: 'numeric',
-    month: 'long',
-  });
-
   return (
     <header className="bg-gradient-to-br from-[#1f4b88] to-[#163a66] text-white shadow-md">
       <div className="mx-auto w-full max-w-4xl px-6 py-4">
@@ -51,7 +35,6 @@ export default async function Header({
             {dict['brand.name']}
           </p>
           <div className="flex items-center gap-2 sm:gap-3">
-            <p className="hidden text-sm text-white/70 sm:inline">{fullDate}</p>
             {isLeader(user?.role) ? <MobileNav /> : null}
             {isPresident ? (
               <NotificationBell
@@ -79,11 +62,6 @@ export default async function Header({
               </Link>
             )}
           </div>
-        </div>
-
-        {/* Fecha corta, solo en movil. */}
-        <div className="mt-1.5 sm:hidden">
-          <p className="text-sm text-white/70">{shortDate}</p>
         </div>
 
         <div className="mt-3">
