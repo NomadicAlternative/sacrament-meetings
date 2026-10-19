@@ -56,7 +56,7 @@ export default function NavLinks({
         className={
           vertical
             ? 'flex flex-col gap-1'
-            : 'flex items-center gap-1.5 overflow-x-auto'
+            : 'flex items-center justify-center gap-1.5 overflow-x-auto'
         }
       >
         {visibleLinks.map(({ path, label }) => {

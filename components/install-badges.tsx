@@ -14,7 +14,7 @@ function PlayIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-5 w-5 shrink-0"
+      className="h-[17px] w-[17px] shrink-0"
       fill="currentColor"
       aria-hidden="true"
     >
@@ -27,7 +27,7 @@ function AppleIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-5 w-5 shrink-0"
+      className="h-[17px] w-[17px] shrink-0"
       fill="currentColor"
       aria-hidden="true"
     >
