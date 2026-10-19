@@ -55,16 +55,18 @@ export interface SacramentMeeting {
   presiding: string;
   conducting: string;
   announcements?: string[];
-  openingHymn: Hymn;
+  // Hymns are optional: the music director fills them in separately, so a
+  // leader can create a meeting without them.
+  openingHymn?: Hymn;
   openingPrayer: string;
   wardBusiness: WardBusinessItem[];
   stakeBusiness: boolean;
-  sacramentHymn: Hymn;
+  sacramentHymn?: Hymn;
   // The intermediate hymn sits between the sacrament and closing hymns. It is
   // omitted on the first Sunday of the month, so it may not exist.
   intermediateHymn?: Hymn;
   speakers: SpeakerItem[];
-  closingHymn: Hymn;
+  closingHymn?: Hymn;
   closingPrayer: string;
 }
 

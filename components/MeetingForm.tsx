@@ -175,8 +175,7 @@ export default function MeetingForm({
               name="openingHymnNumber"
               type="number"
               min={1}
-              required
-              defaultValue={defaultValues?.openingHymn.number}
+              defaultValue={defaultValues?.openingHymn?.number}
               aria-describedby="openingHymnNumber-error"
               className={inputClass}
             />
@@ -193,8 +192,7 @@ export default function MeetingForm({
               id="openingHymnTitle"
               name="openingHymnTitle"
               type="text"
-              required
-              defaultValue={defaultValues?.openingHymn.title}
+              defaultValue={defaultValues?.openingHymn?.title}
               aria-describedby="openingHymnTitle-error"
               className={inputClass}
             />
@@ -237,8 +235,7 @@ export default function MeetingForm({
               name="sacramentHymnNumber"
               type="number"
               min={1}
-              required
-              defaultValue={defaultValues?.sacramentHymn.number}
+              defaultValue={defaultValues?.sacramentHymn?.number}
               aria-describedby="sacramentHymnNumber-error"
               className={inputClass}
             />
@@ -255,8 +252,7 @@ export default function MeetingForm({
               id="sacramentHymnTitle"
               name="sacramentHymnTitle"
               type="text"
-              required
-              defaultValue={defaultValues?.sacramentHymn.title}
+              defaultValue={defaultValues?.sacramentHymn?.title}
               aria-describedby="sacramentHymnTitle-error"
               className={inputClass}
             />
@@ -281,7 +277,6 @@ export default function MeetingForm({
                 name="intermediateHymnNumber"
                 type="number"
                 min={1}
-                required
                 defaultValue={defaultValues?.intermediateHymn?.number}
                 aria-describedby="intermediateHymnNumber-error"
                 className={inputClass}
@@ -299,7 +294,6 @@ export default function MeetingForm({
                 id="intermediateHymnTitle"
                 name="intermediateHymnTitle"
                 type="text"
-                required
                 defaultValue={defaultValues?.intermediateHymn?.title}
                 aria-describedby="intermediateHymnTitle-error"
                 className={inputClass}
@@ -327,8 +321,7 @@ export default function MeetingForm({
               name="closingHymnNumber"
               type="number"
               min={1}
-              required
-              defaultValue={defaultValues?.closingHymn.number}
+              defaultValue={defaultValues?.closingHymn?.number}
               aria-describedby="closingHymnNumber-error"
               className={inputClass}
             />
@@ -345,8 +338,7 @@ export default function MeetingForm({
               id="closingHymnTitle"
               name="closingHymnTitle"
               type="text"
-              required
-              defaultValue={defaultValues?.closingHymn.title}
+              defaultValue={defaultValues?.closingHymn?.title}
               aria-describedby="closingHymnTitle-error"
               className={inputClass}
             />

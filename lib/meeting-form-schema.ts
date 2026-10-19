@@ -14,19 +14,19 @@ export const MeetingFormSchema = z.object({
   }),
   presiding: z.string().min(1, { message: 'Presiding is required.' }),
   conducting: z.string().min(1, { message: 'Conducting is required.' }),
-  openingHymnNumber: z.coerce.number(),
-  openingHymnTitle: z.string().min(1, { message: 'Opening hymn title is required.' }),
+  // Hymns are optional: a leader can leave them blank and the music director
+  // fills them in separately.
+  openingHymnNumber: z.coerce.number().optional(),
+  openingHymnTitle: z.string().optional(),
   openingPrayer: z.string().min(1, { message: 'Opening prayer is required.' }),
-  sacramentHymnNumber: z.coerce.number(),
-  sacramentHymnTitle: z
-    .string()
-    .min(1, { message: 'Sacrament hymn title is required.' }),
+  sacramentHymnNumber: z.coerce.number().optional(),
+  sacramentHymnTitle: z.string().optional(),
   // The intermediate hymn is omitted on the first Sunday of the month, so both
   // fields are optional: absent (first Sunday) maps to undefined.
   intermediateHymnNumber: z.coerce.number().optional(),
   intermediateHymnTitle: z.string().optional(),
-  closingHymnNumber: z.coerce.number(),
-  closingHymnTitle: z.string().min(1, { message: 'Closing hymn title is required.' }),
+  closingHymnNumber: z.coerce.number().optional(),
+  closingHymnTitle: z.string().optional(),
   closingPrayer: z.string().min(1, { message: 'Closing prayer is required.' }),
   // A checkbox only exists in FormData when checked. The value is 'on' when
   // checked and absent otherwise, so preprocess maps that to a boolean before

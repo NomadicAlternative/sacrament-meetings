@@ -139,17 +139,17 @@ function buildMeeting(data: MeetingFormInput): Omit<SacramentMeeting, 'id'> {
     presiding: data.presiding,
     conducting: data.conducting,
     announcements: parseAnnouncements(data.announcements),
-    openingHymn: {
-      number: data.openingHymnNumber,
-      title: data.openingHymnTitle,
-    },
+    openingHymn: buildOptionalHymn(
+      data.openingHymnNumber,
+      data.openingHymnTitle,
+    ),
     openingPrayer: data.openingPrayer,
     wardBusiness: parseWardBusiness(data.wardBusiness),
     stakeBusiness: data.stakeBusiness,
-    sacramentHymn: {
-      number: data.sacramentHymnNumber,
-      title: data.sacramentHymnTitle,
-    },
+    sacramentHymn: buildOptionalHymn(
+      data.sacramentHymnNumber,
+      data.sacramentHymnTitle,
+    ),
     // The intermediate hymn is omitted on the first Sunday of the month even
     // if the fields arrive (defense in depth against a hand-crafted POST).
     intermediateHymn: isFirstSundayOfMonth(data.date)
@@ -159,10 +159,10 @@ function buildMeeting(data: MeetingFormInput): Omit<SacramentMeeting, 'id'> {
           data.intermediateHymnTitle,
         ),
     speakers: parseSpeakers(data.speakers),
-    closingHymn: {
-      number: data.closingHymnNumber,
-      title: data.closingHymnTitle,
-    },
+    closingHymn: buildOptionalHymn(
+      data.closingHymnNumber,
+      data.closingHymnTitle,
+    ),
     closingPrayer: data.closingPrayer,
   };
 }

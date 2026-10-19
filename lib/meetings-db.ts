@@ -147,12 +147,12 @@ export async function addMeeting(
     ) VALUES (
       ${data.date}, ${data.meetingType}, ${data.presiding}, ${data.conducting},
       ${data.announcements ?? []},
-      ${JSON.stringify(data.openingHymn)}::jsonb, ${data.openingPrayer},
+      ${data.openingHymn ? JSON.stringify(data.openingHymn) : null}::jsonb, ${data.openingPrayer},
       ${JSON.stringify(data.wardBusiness)}::jsonb, ${data.stakeBusiness},
-      ${JSON.stringify(data.sacramentHymn)}::jsonb,
+      ${data.sacramentHymn ? JSON.stringify(data.sacramentHymn) : null}::jsonb,
       ${data.intermediateHymn ? JSON.stringify(data.intermediateHymn) : null}::jsonb,
       ${JSON.stringify(data.speakers)}::jsonb,
-      ${JSON.stringify(data.closingHymn)}::jsonb, ${data.closingPrayer}
+      ${data.closingHymn ? JSON.stringify(data.closingHymn) : null}::jsonb, ${data.closingPrayer}
     )
     RETURNING
       id,

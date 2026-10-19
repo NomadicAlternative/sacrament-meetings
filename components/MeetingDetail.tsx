@@ -17,7 +17,10 @@ interface MeetingDetailProps {
 }
 
 // Sub-componente local: el par numero + titulo se repite en los himnos.
-function Hymn({ hymn }: { hymn: HymnType }) {
+function Hymn({ hymn }: { hymn?: HymnType }) {
+  if (!hymn || !hymn.title) {
+    return <span className="text-muted">&mdash;</span>;
+  }
   return (
     <>
       #{hymn.number} &mdash; {hymn.title}
