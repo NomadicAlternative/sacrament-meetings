@@ -23,7 +23,8 @@ function Hymn({ hymn }: { hymn?: HymnType }) {
   }
   return (
     <>
-      #{hymn.number} &mdash; {hymn.title}
+      <span className="font-bold text-[110%]">#{hymn.number}</span>{' '}
+      &mdash; {hymn.title}
     </>
   );
 }
