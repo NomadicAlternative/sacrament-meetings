@@ -28,6 +28,9 @@ export interface AppUser {
   name: string | null;
   role: Role;
   status: MembershipStatus;
+  // True after the president issues a temporary password: the user must pick
+  // a new password on their next sign-in.
+  mustChangePassword: boolean;
 }
 
 export interface Hymn {

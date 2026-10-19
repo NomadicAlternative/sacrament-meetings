@@ -38,6 +38,17 @@ export async function requireHymnEditorSession() {
   return session;
 }
 
+// Throws unless an approved member (any role) is signed in. Used by the
+// change-password action, which any approved member may perform on themselves.
+export async function requireApprovedSession() {
+  const session = await auth();
+  const user = session?.user;
+  if (!user || user.status !== 'approved' || user.userId == null) {
+    throw new Error('Not authorized');
+  }
+  return session;
+}
+
 // Throws unless the signed-in user is the branch president (the admin who
 // approves and rejects membership requests).
 export async function requirePresidentSession() {

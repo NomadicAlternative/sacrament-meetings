@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { listPendingRequests } from '@/lib/users';
@@ -32,6 +33,12 @@ export default async function RequestsPage({
           {dict['requests.title']}
         </h1>
         <p className="text-sm text-muted">{dict['requests.subtitle']}</p>
+        <Link
+          href={`/${loc}/admin/users`}
+          className="w-fit text-sm font-medium text-accent underline-offset-4 hover:underline"
+        >
+          {dict['users.title']}
+        </Link>
       </div>
 
       {requests.length === 0 ? (

@@ -23,6 +23,7 @@ declare module 'next-auth' {
   interface User {
     userId?: number;
     role?: Role;
+    mustChangePassword?: boolean;
   }
 }
 
@@ -87,6 +88,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name ?? user.email,
           email: user.email,
           role: user.role,
+          mustChangePassword: user.mustChangePassword,
         };
       },
     }),
@@ -129,13 +131,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     // sign-in. Pending/rejected/unknown emails are bounced to the login page
     // with a flag so the client can show the right state (or the request modal).
     async signIn({ user, account }) {
-      if (account?.provider === 'credentials') return true;
+      if (account?.provider === 'credentials') {
+        const u = user as { mustChangePassword?: boolean };
+        if (u.mustChangePassword) {
+          return `/${defaultLocale}/change-password`;
+        }
+        return true;
+      }
 
       const email = user.email;
       if (!email) return false;
 
       const existing = await getUserByEmail(email);
-      if (existing?.status === 'approved') return true;
+      if (existing?.status === 'approved') {
+        if (existing.mustChangePassword) {
+          return `/${defaultLocale}/change-password`;
+        }
+        return true;
+      }
 
       if (existing?.status === 'pending') {
         return `/${defaultLocale}/login?status=pending`;

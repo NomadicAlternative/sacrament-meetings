@@ -8,6 +8,7 @@
   "nav.meetings": "Reuniões",
   "nav.current": "Domingo atual",
   "nav.create": "Criar reunião",
+  "nav.users": "Usuários",
 
   "common.loading": "Carregando reuniões...",
 
@@ -164,5 +165,28 @@
   "requests.email": "E-mail",
   "requests.role": "Função",
   "requests.approve": "Aprovar",
-  "requests.reject": "Rejeitar"
+  "requests.reject": "Rejeitar",
+
+  "users.title": "Usuários",
+  "users.subtitle": "Gerencie os membros da presidência e da música.",
+  "users.name": "Nome",
+  "users.email": "E-mail",
+  "users.role": "Função",
+  "users.status": "Status",
+  "users.save": "Salvar",
+  "users.delete": "Excluir",
+  "users.confirmDelete": "Excluir este usuário definitivamente?",
+  "users.generatePassword": "Gerar senha temporária",
+  "users.generating": "Gerando...",
+  "users.tempPassword": "Senha temporária (copie e entregue ao usuário):",
+
+  "status.pending": "Pendente",
+  "status.approved": "Aprovado",
+  "status.rejected": "Rejeitado",
+
+  "changePassword.title": "Alterar senha",
+  "changePassword.subtitle": "Por segurança, escolha uma nova senha para continuar.",
+  "changePassword.password": "Nova senha",
+  "changePassword.save": "Salvar senha",
+  "changePassword.saving": "Salvando..."
 }

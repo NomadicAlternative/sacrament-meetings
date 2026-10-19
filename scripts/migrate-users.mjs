@@ -23,6 +23,7 @@ await sql`
     status        TEXT          NOT NULL DEFAULT 'pending'
                                 CHECK (status IN ('pending','approved','rejected')),
     password_hash TEXT,
+    must_change_password BOOLEAN NOT NULL DEFAULT false,
     created_at    TIMESTAMPTZ   NOT NULL DEFAULT now(),
     approved_at   TIMESTAMPTZ,
     approved_by   INTEGER       REFERENCES users(id)
@@ -35,6 +36,13 @@ await sql`
 await sql`
   ALTER TABLE users
   ADD COLUMN IF NOT EXISTS password_hash TEXT
+`;
+
+// After the president issues a temporary password, this flag forces the user
+// to pick a new password on their next sign-in.
+await sql`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS must_change_password BOOLEAN NOT NULL DEFAULT false
 `;
 
 // The intermediate hymn sits between the sacrament and closing hymns. It is

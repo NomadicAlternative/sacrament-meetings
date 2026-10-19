@@ -44,7 +44,9 @@ export default auth((req) => {
     path.startsWith('/meetings/new') ||
     /^\/meetings\/\d+\/edit$/.test(path) ||
     path.startsWith('/meetings/hymns') ||
-    path.startsWith('/admin/requests');
+    path.startsWith('/admin/requests') ||
+    path.startsWith('/admin/users') ||
+    path.startsWith('/change-password');
 
   if (isProtected && !isLoggedIn) {
     const loginUrl = new URL(`/${locale}/login`, nextUrl);

@@ -14,6 +14,7 @@ function mapRow(row: Record<string, unknown>): AppUser {
     name: (row.name as string | null) ?? null,
     role: row.role as Role,
     status: row.status as MembershipStatus,
+    mustChangePassword: (row.mustChangePassword as boolean) ?? false,
   };
 }
 
@@ -22,7 +23,10 @@ export async function getUserByEmail(
   email: string,
 ): Promise<UserWithPassword | null> {
   const rows = await sql`
-    SELECT id, email, name, role, status, password_hash AS "passwordHash"
+    SELECT
+      id, email, name, role, status,
+      must_change_password AS "mustChangePassword",
+      password_hash AS "passwordHash"
     FROM users
     WHERE email = ${email.trim().toLowerCase()}
   `;
@@ -38,7 +42,9 @@ export async function getUserByEmail(
 
 export async function getUserById(id: number): Promise<AppUser | null> {
   const rows = await sql`
-    SELECT id, email, name, role, status
+    SELECT
+      id, email, name, role, status,
+      must_change_password AS "mustChangePassword"
     FROM users
     WHERE id = ${id}
   `;
@@ -73,7 +79,7 @@ export async function createMembershipRequest(input: {
           password_hash = COALESCE(EXCLUDED.password_hash, users.password_hash),
           approved_at   = NULL,
           approved_by   = NULL
-    RETURNING id, email, name, role, status
+    RETURNING id, email, name, role, status, must_change_password AS "mustChangePassword"
   `;
 
   return mapRow(rows[0]);
@@ -81,7 +87,9 @@ export async function createMembershipRequest(input: {
 
 export async function listPendingRequests(): Promise<AppUser[]> {
   const rows = await sql`
-    SELECT id, email, name, role, status
+    SELECT
+      id, email, name, role, status,
+      must_change_password AS "mustChangePassword"
     FROM users
     WHERE status = 'pending'
     ORDER BY created_at ASC
@@ -95,6 +103,19 @@ export async function countPendingRequests(): Promise<number> {
     SELECT COUNT(*)::int AS count FROM users WHERE status = 'pending'
   `;
   return Number(rows[0].count);
+}
+
+// All users (any status), for the admin user-management table.
+export async function listAllUsers(): Promise<AppUser[]> {
+  const rows = await sql`
+    SELECT
+      id, email, name, role, status,
+      must_change_password AS "mustChangePassword"
+    FROM users
+    ORDER BY created_at ASC
+  `;
+
+  return rows.map(mapRow);
 }
 
 // Approves a request. The president may override the requested role here, so a
@@ -112,7 +133,7 @@ export async function approveRequest(
         approved_at = now(),
         approved_by = ${approverId}
     WHERE id = ${id}
-    RETURNING id, email, name, role, status
+    RETURNING id, email, name, role, status, must_change_password AS "mustChangePassword"
   `;
 
   return rows[0] ? mapRow(rows[0]) : null;
@@ -128,7 +149,62 @@ export async function rejectRequest(
         approved_at = now(),
         approved_by = ${approverId}
     WHERE id = ${id}
-    RETURNING id, email, name, role, status
+    RETURNING id, email, name, role, status, must_change_password AS "mustChangePassword"
+  `;
+
+  return rows[0] ? mapRow(rows[0]) : null;
+}
+
+// Updates a user's name and role (the email stays fixed: it is the sign-in).
+export async function updateUser(
+  id: number,
+  updates: { name: string | null; role: Role },
+): Promise<AppUser | null> {
+  const rows = await sql`
+    UPDATE users
+    SET name = ${updates.name}, role = ${updates.role}
+    WHERE id = ${id}
+    RETURNING id, email, name, role, status, must_change_password AS "mustChangePassword"
+  `;
+
+  return rows[0] ? mapRow(rows[0]) : null;
+}
+
+// Hard-deletes a user row.
+export async function deleteUser(id: number): Promise<boolean> {
+  const rows = await sql`
+    DELETE FROM users WHERE id = ${id} RETURNING id
+  `;
+
+  return rows.length > 0;
+}
+
+// Sets a temporary password and flags the account so the user is forced to
+// pick a new password on their next sign-in.
+export async function setTemporaryPassword(
+  id: number,
+  passwordHash: string,
+): Promise<AppUser | null> {
+  const rows = await sql`
+    UPDATE users
+    SET password_hash = ${passwordHash}, must_change_password = true
+    WHERE id = ${id}
+    RETURNING id, email, name, role, status, must_change_password AS "mustChangePassword"
+  `;
+
+  return rows[0] ? mapRow(rows[0]) : null;
+}
+
+// Records the user's own new password and clears the forced-change flag.
+export async function changePassword(
+  id: number,
+  passwordHash: string,
+): Promise<AppUser | null> {
+  const rows = await sql`
+    UPDATE users
+    SET password_hash = ${passwordHash}, must_change_password = false
+    WHERE id = ${id}
+    RETURNING id, email, name, role, status, must_change_password AS "mustChangePassword"
   `;
 
   return rows[0] ? mapRow(rows[0]) : null;

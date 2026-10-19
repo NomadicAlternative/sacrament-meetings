@@ -5,8 +5,10 @@ import { redirect } from 'next/navigation';
 import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import { randomBytes } from 'node:crypto';
 import { signIn } from '@/auth';
 import {
+  requireApprovedSession,
   requireHymnEditorSession,
   requireLeaderSession,
   requirePresidentSession,
@@ -24,9 +26,13 @@ import {
 } from '@/lib/meetings-db';
 import {
   approveRequest,
+  changePassword as updatePasswordRow,
   createMembershipRequest,
+  deleteUser,
   getUserByEmail,
   rejectRequest,
+  setTemporaryPassword,
+  updateUser,
 } from '@/lib/users';
 import type { Locale } from '@/lib/i18n';
 import { isFirstSundayOfMonth } from '@/lib/format';
@@ -444,4 +450,111 @@ export async function rejectRequestAction(formData: FormData): Promise<void> {
 
   revalidatePath(`/${locale}/admin/requests`);
   redirect(`/${locale}/admin/requests`);
+}
+
+// Change-password form (reached after a forced-change login). Any approved
+// member can set their own new password; it clears the forced-change flag.
+const ChangePasswordSchema = z.object({
+  password: z.string().min(4),
+});
+
+export type ChangePasswordState = {
+  errors?: Record<string, string[]>;
+  message?: string | null;
+};
+
+export async function changePassword(
+  prevState: ChangePasswordState,
+  formData: FormData,
+): Promise<ChangePasswordState> {
+  const session = await requireApprovedSession();
+  const userId = session.user.userId;
+  if (userId == null) {
+    return { message: 'Not authenticated.' };
+  }
+
+  const locale = String(formData.get('locale') || 'es');
+
+  const parsed = ChangePasswordSchema.safeParse({
+    password: formData.get('password'),
+  });
+
+  if (!parsed.success) {
+    return { errors: parsed.error.flatten().fieldErrors };
+  }
+
+  const hash = await bcrypt.hash(parsed.data.password, 10);
+  await updatePasswordRow(userId, hash);
+
+  revalidatePath(`/${locale}`);
+  redirect(`/${locale}/meetings`);
+}
+
+// Admin user management actions (president only).
+
+const TEMP_PASSWORD_ALPHABET =
+  'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+
+function generateTemporaryPassword(): string {
+  const bytes = randomBytes(10);
+  let result = '';
+  for (let i = 0; i < 10; i++) {
+    result += TEMP_PASSWORD_ALPHABET[bytes[i] % TEMP_PASSWORD_ALPHABET.length];
+  }
+  return result;
+}
+
+export type TemporaryPasswordState = {
+  password?: string;
+};
+
+// Generates a random temporary password, stores its hash and flags the account
+// for a forced password change. Returns the plain password so the president can
+// hand it to the user (shown once in the UI).
+export async function generateTemporaryPasswordAction(
+  prevState: TemporaryPasswordState,
+  formData: FormData,
+): Promise<TemporaryPasswordState> {
+  await requirePresidentSession();
+
+  const id = Number(formData.get('id'));
+  const plain = generateTemporaryPassword();
+  const hash = await bcrypt.hash(plain, 10);
+  await setTemporaryPassword(id, hash);
+
+  return { password: plain };
+}
+
+// Updates a user's name and role.
+export async function updateUserAction(formData: FormData): Promise<void> {
+  await requirePresidentSession();
+
+  const id = Number(formData.get('id'));
+  const name = String(formData.get('name') ?? '').trim() || null;
+  const roleRaw = String(formData.get('role') ?? '');
+  const locale = String(formData.get('locale') || 'es');
+
+  if (!(ALL_ROLES as readonly string[]).includes(roleRaw)) return;
+  const role = roleRaw as Role;
+
+  await updateUser(id, { name, role });
+
+  revalidatePath(`/${locale}/admin/users`);
+  redirect(`/${locale}/admin/users`);
+}
+
+// Hard-deletes a user. The president cannot delete their own account.
+export async function deleteUserAction(formData: FormData): Promise<void> {
+  const session = await requirePresidentSession();
+  const currentId = session.user.userId;
+
+  const id = Number(formData.get('id'));
+  const locale = String(formData.get('locale') || 'es');
+
+  if (id === currentId) return;
+
+  await deleteUser(id);
+
+  revalidatePath(`/${locale}/admin/users`);
+  redirect(`/${locale}/admin/users`);
 }
