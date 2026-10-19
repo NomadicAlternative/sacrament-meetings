@@ -117,7 +117,7 @@ export function LoginForm({
             id="email"
             type="email"
             name="email"
-            placeholder="dagc40@gmail.com"
+            placeholder="ejemplo@mail.com"
             required
             className="rounded-md border border-border bg-background px-3 py-2 text-sm outline-none transition-colors duration-150 focus-visible:border-accent"
           />
