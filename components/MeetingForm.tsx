@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react';
 import type { Dictionary } from '@/lib/i18n';
 import { useLocale } from '@/components/locale-provider';
+import { SpeakerEditor } from '@/components/speaker-editor';
 import type { MeetingFormState } from '@/lib/meeting-form-schema';
 import { isFirstSundayOfMonth } from '@/lib/format';
 import type { MeetingType, SacramentMeeting } from '@/lib/types';
@@ -68,15 +69,8 @@ export default function MeetingForm({
 
   const isEditing = defaultValues != null;
 
-  // The three list-like fields are textareas with one entry per line. For
-  // editing, the stored arrays are flattened back into that line format so the
-  // user can read and change what is already saved.
-  const speakersDefault = defaultValues
-    ? defaultValues.speakers
-        .map((item) => `${item.name} | ${item.topic} | ${item.type}`)
-        .join('\n')
-    : '';
-
+  // The two list-like fields (ward business, announcements) are textareas
+  // with one entry per line; speakers use the dedicated SpeakerEditor.
   const wardBusinessDefault = defaultValues
     ? defaultValues.wardBusiness.map((item) => item.description).join('\n')
     : '';
@@ -434,19 +428,8 @@ export default function MeetingForm({
       </div>
 
       <div className="flex flex-col gap-1">
-        <label htmlFor="speakers" className={labelClass}>
-          {t('form.speakersTitle')}
-        </label>
-        <textarea
-          id="speakers"
-          name="speakers"
-          rows={5}
-          defaultValue={speakersDefault}
-          aria-describedby="speakers-error"
-          className={inputClass}
-        />
-        <p className="text-xs text-muted">{t('form.onePerLineHint')}</p>
-        <FieldError id="speakers-error" errors={state.errors?.speakers} />
+        <span className={labelClass}>{t('form.speakersTitle')}</span>
+        <SpeakerEditor defaultSpeakers={defaultValues?.speakers ?? []} />
       </div>
 
       <button
