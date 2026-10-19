@@ -48,7 +48,7 @@ function AgendaItem({
 }) {
   return (
     <div className="border-b border-border/60 py-2.5 last:border-0">
-      <dt className="text-[11px] font-bold uppercase tracking-wider text-accent-warm">
+      <dt className="text-[11px] font-bold uppercase tracking-wider text-foreground">
         {label}
       </dt>
       <dd className="mt-0.5 text-sm">{children}</dd>
@@ -122,13 +122,6 @@ export default async function MeetingDetail({
                   </button>
                 </form>
               </>
-            ) : isMusicDirector ? (
-              <Link
-                href={`/${locale}/meetings/hymns/${meeting.date}`}
-                className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-              >
-                {dict['hymns.editHymns']}
-              </Link>
             ) : null}
           </div>
         </div>
@@ -227,6 +220,16 @@ export default async function MeetingDetail({
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {/* Boton fijo para la directora de musica: siempre visible. */}
+      {isMusicDirector ? (
+        <Link
+          href={`/${locale}/meetings/hymns/${meeting.date}`}
+          className="fixed bottom-6 right-6 z-30 rounded-full bg-accent-warm px-5 py-3 text-sm font-semibold text-white shadow-lg transition-transform duration-150 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-warm"
+        >
+          {dict['hymns.editHymns']}
+        </Link>
       ) : null}
     </article>
   );

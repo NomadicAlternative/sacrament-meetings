@@ -274,8 +274,15 @@ export async function authenticate(
     return { status: 'rejected' };
   }
 
+  const locale = String(formData.get('locale') || 'es');
+
   try {
-    await signIn('credentials', formData);
+    // `redirectTo` (no `callbackUrl`) is the field the server signIn honors.
+    await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirectTo: `/${locale}`,
+    });
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {

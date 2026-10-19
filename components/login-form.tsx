@@ -108,6 +108,7 @@ export function LoginForm({
       <form action={formAction} className="flex flex-col gap-4">
         {/* After a successful sign-in, land on the localized meetings list. */}
         <input type="hidden" name="callbackUrl" value={`/${locale}`} />
+        <input type="hidden" name="locale" value={locale} />
         <div className="flex flex-col gap-1.5">
           <label htmlFor="email" className="text-sm font-medium">
             {t('login.email')}
