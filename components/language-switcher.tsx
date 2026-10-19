@@ -25,20 +25,20 @@ export function LanguageSwitcher() {
       {/* Thumb que se desliza sobre el idioma activo. */}
       <span
         aria-hidden="true"
-        className={`absolute bottom-1 left-1 top-1 w-10 rounded-full bg-white shadow-md transition-transform duration-200 ease-out ${
+        className={`absolute bottom-1 left-1 top-1 w-10 rounded-full bg-accent-warm shadow-md transition-transform duration-200 ease-out ${
           isEs ? 'translate-x-10' : 'translate-x-0'
         }`}
       />
       <span
         className={`relative z-10 w-10 py-1 text-center transition-colors duration-200 ${
-          isEs ? 'text-white/70' : 'text-accent'
+          isEs ? 'text-white/70' : 'text-white'
         }`}
       >
         PT
       </span>
       <span
         className={`relative z-10 w-10 py-1 text-center transition-colors duration-200 ${
-          isEs ? 'text-accent' : 'text-white/70'
+          isEs ? 'text-white' : 'text-white/70'
         }`}
       >
         ES

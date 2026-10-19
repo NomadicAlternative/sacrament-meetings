@@ -89,7 +89,7 @@ export default async function Header({
           <div className="hidden sm:block">
             <NavLinks isLeader={isLeader(user?.role)} />
           </div>
-          <MobileNav isLeader={isLeader(user?.role)} />
+          {isLeader(user?.role) ? <MobileNav /> : null}
         </div>
       </div>
     </header>

@@ -68,7 +68,7 @@ export default async function HymnsPage({
                 </div>
                 {topics.length > 0 ? (
                   <div className="mt-1.5 text-xs text-muted">
-                    <span className="font-semibold text-accent-warm">
+                    <span className="font-semibold text-foreground">
                       {dict['hymns.topics']}:
                     </span>{' '}
                     {topics.map((topic) => `«${topic}»`).join(' · ')}

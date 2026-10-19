@@ -47,7 +47,7 @@ export default async function MeetingCard({
           <h2 className="text-base font-semibold tracking-tight">
             {formatShortDate(meeting.date, locale)}
           </h2>
-          <span className="rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted">
+          <span className="rounded-full bg-accent-warm px-2.5 py-0.5 text-xs font-semibold text-white">
             {typeLabel}
           </span>
         </div>
