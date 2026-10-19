@@ -24,7 +24,8 @@
   "install.appStore": "App Store",
   "install.iosSteps": "iPhone (Safari):\n1. Abre la app en Safari.\n2. Toca Compartir (📤).\n3. Elige «Añadir a pantalla de inicio».\n4. Confirma con «Añadir».",
 
-  "home.title": "Planificador de Reuniones Sacramentales",
+  "home.title": "Reuniones Dominicales",
+  "home.titleEditor": "Planificador de Reuniones",
   "home.subtitle": "Consulta los programas de las reuniones de la Rama Elda.",
   "home.viewMeetings": "Ver reuniones",
   "home.thisSunday": "Programa de este domingo",
