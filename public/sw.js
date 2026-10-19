@@ -2,7 +2,7 @@
 // Estrategia: network-first con fallback a caché, solo para GET same-origin.
 // Las rutas /api/* (datos dinámicos y auth) nunca se cachean.
 
-const CACHE = 'rama-eldas-v1';
+const CACHE = 'rama-eldas-v2';
 
 self.addEventListener('install', () => {
   self.skipWaiting();
@@ -37,6 +37,18 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       })
-      .catch(() => caches.match(request)),
+      .catch(async () => {
+        // Cache miss devuelve undefined; respondWith(undefined) rompe con
+        // "Failed to convert value to 'Response'", asi que se devuelve un
+        // Response valido de offline como fallback.
+        const cached = await caches.match(request);
+        return (
+          cached ??
+          new Response('Offline', {
+            status: 503,
+            headers: { 'Content-Type': 'text/plain' },
+          })
+        );
+      }),
   );
 });
