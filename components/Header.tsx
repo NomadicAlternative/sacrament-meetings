@@ -3,7 +3,10 @@ import { auth } from '@/auth';
 import NavLinks from '@/components/NavLinks';
 import { SignOutButton } from '@/components/sign-out-button';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { LogInIcon } from '@/components/icons';
+import { NotificationBell } from '@/components/notifications-bell';
 import { getLocaleTag } from '@/lib/format';
+import { countPendingRequests } from '@/lib/users';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
 // Encabezado global: nombre de la rama, fecha actual y estado de sesion.
@@ -21,6 +24,11 @@ export default async function Header({
 }) {
   const session = await auth();
   const user = session?.user;
+
+  // Only the president sees the requests bell; its badge counts the pending
+  // access requests waiting for approval.
+  const isPresident = user?.role === 'president';
+  const pendingCount = isPresident ? await countPendingRequests() : 0;
 
   const fullDate = new Date().toLocaleDateString(getLocaleTag(locale), {
     weekday: 'long',
@@ -42,6 +50,13 @@ export default async function Header({
           </p>
           <div className="flex items-center gap-2 sm:gap-3">
             <p className="hidden text-sm text-white/70 sm:inline">{fullDate}</p>
+            {isPresident ? (
+              <NotificationBell
+                locale={locale}
+                count={pendingCount}
+                label={dict['header.requests']}
+              />
+            ) : null}
             <LanguageSwitcher />
             {user ? (
               <div className="flex items-center gap-1">
@@ -53,9 +68,11 @@ export default async function Header({
             ) : (
               <Link
                 href={`/${locale}/login`}
-                className="block whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white sm:px-3"
+                aria-label={dict['header.signIn']}
+                title={dict['header.signIn']}
+                className="flex h-9 w-9 items-center justify-center rounded-md text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
               >
-                {dict['header.signIn']}
+                <LogInIcon className="h-5 w-5" />
               </Link>
             )}
           </div>

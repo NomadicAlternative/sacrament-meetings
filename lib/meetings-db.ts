@@ -15,6 +15,9 @@ export const ITEMS_PER_PAGE = 5;
 // empty. The type says `announcements?: string[]` — "may not exist" — which is
 // different from "exists and is empty". Without this, the detail page would
 // render an empty Announcements section on every meeting that has none.
+//
+// intermediate_hymn is nullable on purpose: it is omitted on the first Sunday
+// of the month, so a NULL column maps to an absent `intermediateHymn` field.
 
 export async function getMeetings(
   query: string = '',
@@ -36,6 +39,7 @@ export async function getMeetings(
       ward_business               AS "wardBusiness",
       stake_business              AS "stakeBusiness",
       sacrament_hymn              AS "sacramentHymn",
+      intermediate_hymn           AS "intermediateHymn",
       speakers,
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"
@@ -84,6 +88,7 @@ export async function getMeetingById(id: number): Promise<SacramentMeeting | nul
       ward_business               AS "wardBusiness",
       stake_business              AS "stakeBusiness",
       sacrament_hymn              AS "sacramentHymn",
+      intermediate_hymn           AS "intermediateHymn",
       speakers,
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"
@@ -115,6 +120,7 @@ export async function getMeetingByDate(isoDate: string): Promise<SacramentMeetin
       ward_business               AS "wardBusiness",
       stake_business              AS "stakeBusiness",
       sacrament_hymn              AS "sacramentHymn",
+      intermediate_hymn           AS "intermediateHymn",
       speakers,
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"
@@ -137,13 +143,14 @@ export async function addMeeting(
     INSERT INTO meetings (
       date, meeting_type, presiding, conducting, announcements,
       opening_hymn, opening_prayer, ward_business, stake_business,
-      sacrament_hymn, speakers, closing_hymn, closing_prayer
+      sacrament_hymn, intermediate_hymn, speakers, closing_hymn, closing_prayer
     ) VALUES (
       ${data.date}, ${data.meetingType}, ${data.presiding}, ${data.conducting},
       ${data.announcements ?? []},
       ${JSON.stringify(data.openingHymn)}::jsonb, ${data.openingPrayer},
       ${JSON.stringify(data.wardBusiness)}::jsonb, ${data.stakeBusiness},
       ${JSON.stringify(data.sacramentHymn)}::jsonb,
+      ${data.intermediateHymn ? JSON.stringify(data.intermediateHymn) : null}::jsonb,
       ${JSON.stringify(data.speakers)}::jsonb,
       ${JSON.stringify(data.closingHymn)}::jsonb, ${data.closingPrayer}
     )
@@ -159,6 +166,7 @@ export async function addMeeting(
       ward_business               AS "wardBusiness",
       stake_business              AS "stakeBusiness",
       sacrament_hymn              AS "sacramentHymn",
+      intermediate_hymn           AS "intermediateHymn",
       speakers,
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"
@@ -171,6 +179,10 @@ export async function addMeeting(
 // `updates`. Passing NULL for a JSONB/text column inside `${}` is safe: the
 // ::jsonb cast turns it into NULL::jsonb, so COALESCE falls back to the old
 // value instead of overwriting it.
+//
+// intermediate_hymn is the exception: the edit form always submits the full
+// meeting, and an absent intermediate hymn must CLEAR the column (first Sunday
+// of the month), so it is set directly instead of through COALESCE.
 export async function updateMeeting(
   id: number,
   updates: Partial<SacramentMeeting>,
@@ -178,19 +190,20 @@ export async function updateMeeting(
   const rows = await sql`
     UPDATE meetings
     SET
-      date             = COALESCE(${updates.date ?? null}, date),
-      meeting_type     = COALESCE(${updates.meetingType ?? null}, meeting_type),
-      presiding        = COALESCE(${updates.presiding ?? null}, presiding),
-      conducting       = COALESCE(${updates.conducting ?? null}, conducting),
-      announcements    = COALESCE(${updates.announcements ?? null}, announcements),
-      opening_hymn     = COALESCE(${updates.openingHymn ? JSON.stringify(updates.openingHymn) : null}::jsonb, opening_hymn),
-      opening_prayer   = COALESCE(${updates.openingPrayer ?? null}, opening_prayer),
-      ward_business    = COALESCE(${updates.wardBusiness ? JSON.stringify(updates.wardBusiness) : null}::jsonb, ward_business),
-      stake_business   = COALESCE(${updates.stakeBusiness ?? null}, stake_business),
-      sacrament_hymn   = COALESCE(${updates.sacramentHymn ? JSON.stringify(updates.sacramentHymn) : null}::jsonb, sacrament_hymn),
-      speakers         = COALESCE(${updates.speakers ? JSON.stringify(updates.speakers) : null}::jsonb, speakers),
-      closing_hymn     = COALESCE(${updates.closingHymn ? JSON.stringify(updates.closingHymn) : null}::jsonb, closing_hymn),
-      closing_prayer   = COALESCE(${updates.closingPrayer ?? null}, closing_prayer)
+      date               = COALESCE(${updates.date ?? null}, date),
+      meeting_type       = COALESCE(${updates.meetingType ?? null}, meeting_type),
+      presiding          = COALESCE(${updates.presiding ?? null}, presiding),
+      conducting         = COALESCE(${updates.conducting ?? null}, conducting),
+      announcements      = COALESCE(${updates.announcements ?? null}, announcements),
+      opening_hymn       = COALESCE(${updates.openingHymn ? JSON.stringify(updates.openingHymn) : null}::jsonb, opening_hymn),
+      opening_prayer     = COALESCE(${updates.openingPrayer ?? null}, opening_prayer),
+      ward_business      = COALESCE(${updates.wardBusiness ? JSON.stringify(updates.wardBusiness) : null}::jsonb, ward_business),
+      stake_business     = COALESCE(${updates.stakeBusiness ?? null}, stake_business),
+      sacrament_hymn     = COALESCE(${updates.sacramentHymn ? JSON.stringify(updates.sacramentHymn) : null}::jsonb, sacrament_hymn),
+      intermediate_hymn  = ${updates.intermediateHymn ? JSON.stringify(updates.intermediateHymn) : null}::jsonb,
+      speakers           = COALESCE(${updates.speakers ? JSON.stringify(updates.speakers) : null}::jsonb, speakers),
+      closing_hymn       = COALESCE(${updates.closingHymn ? JSON.stringify(updates.closingHymn) : null}::jsonb, closing_hymn),
+      closing_prayer     = COALESCE(${updates.closingPrayer ?? null}, closing_prayer)
     WHERE id = ${id}
     RETURNING
       id,
@@ -204,6 +217,7 @@ export async function updateMeeting(
       ward_business               AS "wardBusiness",
       stake_business              AS "stakeBusiness",
       sacrament_hymn              AS "sacramentHymn",
+      intermediate_hymn           AS "intermediateHymn",
       speakers,
       closing_hymn                AS "closingHymn",
       closing_prayer              AS "closingPrayer"

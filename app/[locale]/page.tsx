@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { auth } from '@/auth';
 import { InstallBadges } from '@/components/install-badges';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 
@@ -12,6 +13,12 @@ export default async function Home({
   const loc: Locale = isLocale(locale) ? locale : 'es';
   const dict = getDictionary(loc);
 
+  // Public visitors see "Reuniones Dominicales"; an approved editor sees the
+  // planner title instead.
+  const session = await auth();
+  const isEditor = session?.user?.status === 'approved';
+  const homeTitle = isEditor ? dict['home.titleEditor'] : dict['home.title'];
+
   const primaryButton =
     'inline-flex h-11 items-center justify-center rounded-lg bg-accent px-5 text-sm font-semibold text-accent-foreground shadow-md transition duration-150 ease-out hover:opacity-90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
   const secondaryButton =
@@ -22,7 +29,7 @@ export default async function Home({
       <section className="grid w-full items-center gap-10 bg-gradient-to-br from-accent/10 to-background px-6 py-12 sm:grid-cols-[1fr_auto] sm:gap-14 sm:py-16">
         <div className="flex flex-col gap-5 text-center sm:text-left">
           <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-            {dict['home.title']}
+            {homeTitle}
           </h1>
           <p className="max-w-prose text-base leading-relaxed text-muted">
             {dict['home.subtitle']}

@@ -21,6 +21,10 @@ export const MeetingFormSchema = z.object({
   sacramentHymnTitle: z
     .string()
     .min(1, { message: 'Sacrament hymn title is required.' }),
+  // The intermediate hymn is omitted on the first Sunday of the month, so both
+  // fields are optional: absent (first Sunday) maps to undefined.
+  intermediateHymnNumber: z.coerce.number().optional(),
+  intermediateHymnTitle: z.string().optional(),
   closingHymnNumber: z.coerce.number(),
   closingHymnTitle: z.string().min(1, { message: 'Closing hymn title is required.' }),
   closingPrayer: z.string().min(1, { message: 'Closing prayer is required.' }),

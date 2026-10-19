@@ -88,6 +88,11 @@ export default function MeetingDetail({
         <Field label={dict['detail.sacramentHymn']}>
           <Hymn hymn={meeting.sacramentHymn} />
         </Field>
+        {meeting.intermediateHymn ? (
+          <Field label={dict['detail.intermediateHymn']}>
+            <Hymn hymn={meeting.intermediateHymn} />
+          </Field>
+        ) : null}
         <Field label={dict['detail.stakeBusiness']}>
           {meeting.stakeBusiness ? dict['detail.yes'] : dict['detail.no']}
         </Field>

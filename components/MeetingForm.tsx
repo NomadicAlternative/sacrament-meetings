@@ -1,9 +1,10 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useState } from 'react';
 import type { Dictionary } from '@/lib/i18n';
 import { useLocale } from '@/components/locale-provider';
 import type { MeetingFormState } from '@/lib/meeting-form-schema';
+import { isFirstSundayOfMonth } from '@/lib/format';
 import type { MeetingType, SacramentMeeting } from '@/lib/types';
 
 // Shared by the create and edit pages. `action` is the Server Action to run on
@@ -60,6 +61,11 @@ export default function MeetingForm({
   const [state, formAction, isPending] = useActionState(action, initialState);
   const { t } = useLocale();
 
+  // The intermediate hymn is shown/hidden live as the date changes: it is
+  // omitted on the first Sunday of the month.
+  const [date, setDate] = useState(defaultValues?.date ?? '');
+  const isFirstSunday = date ? isFirstSundayOfMonth(date) : false;
+
   const isEditing = defaultValues != null;
 
   // The three list-like fields are textareas with one entry per line. For
@@ -100,6 +106,7 @@ export default function MeetingForm({
           type="date"
           required
           defaultValue={defaultValues?.date}
+          onChange={(e) => setDate(e.target.value)}
           aria-describedby="date-error"
           className={inputClass}
         />
@@ -266,6 +273,53 @@ export default function MeetingForm({
           </div>
         </div>
       </fieldset>
+
+      {!isFirstSunday ? (
+        <fieldset className="flex flex-col gap-1">
+          <legend className={labelClass}>{t('form.intermediateHymn')}</legend>
+          <div className="grid gap-4 sm:grid-cols-[8rem_1fr]">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="intermediateHymnNumber" className="text-xs text-muted">
+                {t('form.number')}
+              </label>
+              <input
+                id="intermediateHymnNumber"
+                name="intermediateHymnNumber"
+                type="number"
+                min={1}
+                required
+                defaultValue={defaultValues?.intermediateHymn?.number}
+                aria-describedby="intermediateHymnNumber-error"
+                className={inputClass}
+              />
+              <FieldError
+                id="intermediateHymnNumber-error"
+                errors={state.errors?.intermediateHymnNumber}
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="intermediateHymnTitle" className="text-xs text-muted">
+                {t('form.title')}
+              </label>
+              <input
+                id="intermediateHymnTitle"
+                name="intermediateHymnTitle"
+                type="text"
+                required
+                defaultValue={defaultValues?.intermediateHymn?.title}
+                aria-describedby="intermediateHymnTitle-error"
+                className={inputClass}
+              />
+              <FieldError
+                id="intermediateHymnTitle-error"
+                errors={state.errors?.intermediateHymnTitle}
+              />
+            </div>
+          </div>
+        </fieldset>
+      ) : (
+        <p className="text-sm text-muted">{t('form.firstSundayNote')}</p>
+      )}
 
       <fieldset className="flex flex-col gap-1">
         <legend className={labelClass}>{t('form.closingHymn')}</legend>
