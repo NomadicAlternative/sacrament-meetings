@@ -104,6 +104,7 @@
   "login.credentialsError": "Correo o contraseña incorrectos.",
   "login.statusPending": "Tu solicitud está pendiente de aprobación del Presidente.",
   "login.statusRejected": "Tu solicitud de acceso fue rechazada.",
+  "login.requestAccess": "Solicitar acceso",
 
   "pagination.label": "Paginación",
   "pagination.previous": "Anterior",

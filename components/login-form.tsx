@@ -29,27 +29,31 @@ export function LoginForm({
   );
   const { locale, t } = useLocale();
 
-  // The modal is derived from the latest sign-in state (a credentials attempt
-  // against an unknown email) or from the OAuth bounce (initialRequest). A
-  // dismiss key keeps it closed after the user closes it without a setState in
-  // an effect.
+  // The modal opens from three sources: the visible "request access" button,
+  // a credentials attempt against an unknown email, or the OAuth bounce. The
+  // dismiss key keeps the auto-opened modal closed after the user closes it.
   const [dismissedKey, setDismissedKey] = useState<string | null>(null);
+  const [requestOpen, setRequestOpen] = useState(false);
 
   const credentialsEmail =
     state?.status === 'not_registered' ? state.email : undefined;
 
-  const modalKey = credentialsEmail
+  const autoModalKey = credentialsEmail
     ? `credentials:${credentialsEmail}`
     : initialRequest
       ? `oauth:${initialRequest.email ?? initialRequest.name ?? 'request'}`
       : null;
 
-  const modal: ModalState | null =
-    modalKey && modalKey !== dismissedKey
+  const autoModal: ModalState | null =
+    autoModalKey && autoModalKey !== dismissedKey
       ? credentialsEmail
         ? { mode: 'credentials', email: credentialsEmail }
         : { mode: 'oauth', ...initialRequest }
       : null;
+
+  const modal: ModalState | null = requestOpen
+    ? { mode: 'credentials' }
+    : autoModal;
 
   const oauthButton =
     'flex h-10 w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-3 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent';
@@ -147,12 +151,23 @@ export function LoginForm({
         ) : null}
       </form>
 
+      <button
+        type="button"
+        onClick={() => setRequestOpen(true)}
+        className="w-fit text-sm font-medium text-accent underline-offset-4 hover:underline"
+      >
+        {t('login.requestAccess')}
+      </button>
+
       {modal ? (
         <RequestAccessModal
           mode={modal.mode}
           defaultEmail={modal.email}
           defaultName={modal.name}
-          onClose={() => setDismissedKey(modalKey)}
+          onClose={() => {
+            if (requestOpen) setRequestOpen(false);
+            else setDismissedKey(autoModalKey);
+          }}
         />
       ) : null}
     </div>
