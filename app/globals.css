@@ -4,7 +4,7 @@
    Tailwind 4 los expone automaticamente como utilidades gracias a @theme:
    --color-card -> bg-card / text-card, --color-muted -> text-muted, etc. */
 :root {
-  --background: #f1f5f9;
+  --background: #ffffff;
   --foreground: #0f172a;
   --card: #ffffff;
   --border: #e2e8f0;

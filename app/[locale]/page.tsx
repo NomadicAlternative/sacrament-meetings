@@ -28,7 +28,7 @@ export default async function Home({
 
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <section className="flex w-full flex-col items-center gap-6 bg-gradient-to-br from-accent/10 to-background px-6 py-12 sm:py-16">
+      <section className="flex w-full flex-col items-center gap-6 bg-gradient-to-br from-accent/10 to-[#f1f5f9] px-6 py-12 sm:py-16">
         <div className="flex flex-col items-center gap-5 text-center">
           <h1 className="text-balance text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
             {homeTitle}
