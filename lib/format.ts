@@ -51,6 +51,29 @@ export function formatShortDate(isoDate: string, locale: Locale): string {
   });
 }
 
+// Devuelve los proximos `count` domingos en ISO (YYYY-MM-DD), empezando por el
+// domingo actual si hoy es domingo. Se usa para que la directora elija un
+// domingo y cargue los himnos, sin depender de que exista una reunion.
+export function getUpcomingSundays(
+  count: number,
+  from: Date = new Date(),
+): string[] {
+  const result: string[] = [];
+  const cursor = new Date(from);
+  cursor.setHours(0, 0, 0, 0);
+
+  while (cursor.getDay() !== 0) {
+    cursor.setDate(cursor.getDate() + 1);
+  }
+
+  for (let i = 0; i < count; i++) {
+    result.push(toIsoDate(cursor));
+    cursor.setDate(cursor.getDate() + 7);
+  }
+
+  return result;
+}
+
 // El primer domingo del mes es un domingo cuyo dia cae entre 1 y 7. En ese
 // domingo (ayuno y testimonios) no se canta himno intermedio, asi que el
 // formulario y la plantilla lo omiten.

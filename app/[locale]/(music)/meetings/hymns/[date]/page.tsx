@@ -1,18 +1,18 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
 import { isLeader } from '@/lib/auth-guards';
 import { HymnForm } from '@/components/hymn-form';
-import { getMeetingById } from '@/lib/meetings-db';
+import { getHymnsByDate } from '@/lib/hymns-db';
 import { formatMeetingDate } from '@/lib/format';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 
 export default async function EditHymnsPage({
   params,
 }: {
-  params: Promise<{ id: string; locale: string }>;
+  params: Promise<{ date: string; locale: string }>;
 }) {
-  const { id, locale } = await params;
+  const { date, locale } = await params;
   const loc: Locale = isLocale(locale) ? locale : 'es';
   const dict = getDictionary(loc);
 
@@ -25,10 +25,7 @@ export default async function EditHymnsPage({
     redirect(`/${loc}/meetings`);
   }
 
-  const meeting = await getMeetingById(Number(id));
-  if (!meeting) {
-    notFound();
-  }
+  const hymns = await getHymnsByDate(date);
 
   return (
     <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
@@ -39,9 +36,9 @@ export default async function EditHymnsPage({
         {dict['hymns.back']}
       </Link>
       <h2 className="mt-2 text-xl font-semibold tracking-tight">
-        {formatMeetingDate(meeting.date, loc)}
+        {formatMeetingDate(date, loc)}
       </h2>
-      <HymnForm meeting={meeting} />
+      <HymnForm date={date} hymns={hymns} />
     </div>
   );
 }

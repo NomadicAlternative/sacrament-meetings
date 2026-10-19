@@ -20,10 +20,10 @@ import {
 } from '@/lib/meeting-form-schema';
 import {
   addMeeting,
-  getMeetingById,
   updateMeeting as updateMeetingRow,
   deleteMeeting as deleteMeetingRow,
 } from '@/lib/meetings-db';
+import { upsertHymns } from '@/lib/hymns-db';
 import {
   approveRequest,
   changePassword as updatePasswordRow,
@@ -353,16 +353,15 @@ export type HymnFormState = {
 };
 
 export async function updateHymns(
-  id: number,
+  date: string,
   locale: Locale,
   prevState: HymnFormState,
   formData: FormData,
 ): Promise<HymnFormState> {
-  await requireHymnEditorSession();
-
-  const meeting = await getMeetingById(id);
-  if (!meeting) {
-    return { message: 'This meeting no longer exists.' };
+  const session = await requireHymnEditorSession();
+  const userId = session.user.userId;
+  if (userId == null) {
+    return { message: 'Not authenticated.' };
   }
 
   const parsed = HymnFormSchema.safeParse({
@@ -383,9 +382,9 @@ export async function updateHymns(
     };
   }
 
-  const firstSunday = isFirstSundayOfMonth(meeting.date);
+  const firstSunday = isFirstSundayOfMonth(date);
 
-  const updates: Partial<SacramentMeeting> = {
+  const hymns = {
     openingHymn: {
       number: parsed.data.openingHymnNumber,
       title: parsed.data.openingHymnTitle,
@@ -407,12 +406,12 @@ export async function updateHymns(
   };
 
   try {
-    await updateMeetingRow(id, updates);
+    await upsertHymns(date, hymns, userId);
   } catch {
     return { message: 'Database error: could not update the hymns.' };
   }
 
-  revalidatePath(`/${locale}/meetings`);
+  revalidatePath(`/${locale}/meetings/hymns`);
   redirect(`/${locale}/meetings/hymns`);
 }
 

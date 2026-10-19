@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import { isLeader } from '@/lib/auth-guards';
 import MeetingForm from '@/components/MeetingForm';
 import { getMeetingById } from '@/lib/meetings-db';
+import { getHymnsByDate } from '@/lib/hymns-db';
 import { updateMeeting } from '@/lib/actions';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 
@@ -37,6 +38,19 @@ export default async function EditMeetingPage({
     notFound();
   }
 
+  // Pre-fill the hymn fields from the music director's sunday_hymns entry (if
+  // any), so the leader sees the hymns already selected for that Sunday.
+  const sundayHymns = await getHymnsByDate(meeting.date);
+  const defaultValues = sundayHymns
+    ? {
+        ...meeting,
+        openingHymn: sundayHymns.openingHymn,
+        sacramentHymn: sundayHymns.sacramentHymn,
+        intermediateHymn: sundayHymns.intermediateHymn ?? meeting.intermediateHymn,
+        closingHymn: sundayHymns.closingHymn,
+      }
+    : meeting;
+
   return (
     <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
       <h2 className="text-xl font-semibold tracking-tight">
@@ -50,7 +64,7 @@ export default async function EditMeetingPage({
       </Link>
       <MeetingForm
         action={updateMeeting.bind(null, meeting.id, loc)}
-        defaultValues={meeting}
+        defaultValues={defaultValues}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { isLeader } from '@/lib/auth-guards';
 import type { Hymn as HymnType, SacramentMeeting } from '@/lib/types';
 import { formatMeetingDate } from '@/lib/format';
 import { deleteMeeting } from '@/lib/actions';
+import { getHymnsByDate } from '@/lib/hymns-db';
 import { getDictionary, type Dictionary, type Locale } from '@/lib/i18n';
 
 interface MeetingDetailProps {
@@ -47,6 +48,15 @@ export default async function MeetingDetail({
   const isMusicDirector = user?.role === 'music_director';
   const dict = getDictionary(locale);
   const typeLabel = dict[`type.${meeting.meetingType}` as keyof Dictionary];
+
+  // Hymns the music director set for this Sunday override the meeting's own
+  // hymn fields (fall back to the meeting when none are set).
+  const sundayHymns = await getHymnsByDate(meeting.date);
+  const openingHymn = sundayHymns?.openingHymn ?? meeting.openingHymn;
+  const sacramentHymn = sundayHymns?.sacramentHymn ?? meeting.sacramentHymn;
+  const intermediateHymn =
+    sundayHymns?.intermediateHymn ?? meeting.intermediateHymn;
+  const closingHymn = sundayHymns?.closingHymn ?? meeting.closingHymn;
 
   return (
     <article className="rounded-lg border border-border bg-card p-6 shadow-sm">
@@ -97,24 +107,24 @@ export default async function MeetingDetail({
         <Field label={dict['detail.presiding']}>{meeting.presiding}</Field>
         <Field label={dict['detail.conducting']}>{meeting.conducting}</Field>
         <Field label={dict['detail.openingHymn']}>
-          <Hymn hymn={meeting.openingHymn} />
+          <Hymn hymn={openingHymn} />
         </Field>
         <Field label={dict['detail.openingPrayer']}>
           {meeting.openingPrayer}
         </Field>
         <Field label={dict['detail.sacramentHymn']}>
-          <Hymn hymn={meeting.sacramentHymn} />
+          <Hymn hymn={sacramentHymn} />
         </Field>
-        {meeting.intermediateHymn ? (
+        {intermediateHymn ? (
           <Field label={dict['detail.intermediateHymn']}>
-            <Hymn hymn={meeting.intermediateHymn} />
+            <Hymn hymn={intermediateHymn} />
           </Field>
         ) : null}
         <Field label={dict['detail.stakeBusiness']}>
           {meeting.stakeBusiness ? dict['detail.yes'] : dict['detail.no']}
         </Field>
         <Field label={dict['detail.closingHymn']}>
-          <Hymn hymn={meeting.closingHymn} />
+          <Hymn hymn={closingHymn} />
         </Field>
         <Field label={dict['detail.closingPrayer']}>
           {meeting.closingPrayer}

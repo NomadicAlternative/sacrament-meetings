@@ -156,6 +156,7 @@
   "hymns.subtitle": "Selecciona los himnos de cada domingo.",
   "hymns.selectSunday": "Elige un domingo",
   "hymns.editHymns": "Editar himnos",
+  "hymns.loadHymns": "Cargar himnos",
   "hymns.back": "Volver a los himnos",
 
   "requests.title": "Solicitudes de acceso",

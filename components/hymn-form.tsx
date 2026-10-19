@@ -4,7 +4,7 @@ import { useActionState } from 'react';
 import { updateHymns, type HymnFormState } from '@/lib/actions';
 import { useLocale } from '@/components/locale-provider';
 import { isFirstSundayOfMonth } from '@/lib/format';
-import type { SacramentMeeting } from '@/lib/types';
+import type { SundayHymns } from '@/lib/hymns-db';
 
 const inputClass =
   'w-full rounded-md border border-border bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
@@ -83,16 +83,23 @@ function HymnFields({
   );
 }
 
-// Hymns-only editor for a specific meeting. The music director (and leaders)
-// set the four hymns; the intermediate hymn is omitted on the first Sunday.
-export function HymnForm({ meeting }: { meeting: SacramentMeeting }) {
+// Hymns-only editor for a specific Sunday date. The music director (and
+// leaders) set the four hymns; the intermediate hymn is omitted on the first
+// Sunday of the month.
+export function HymnForm({
+  date,
+  hymns,
+}: {
+  date: string;
+  hymns?: SundayHymns | null;
+}) {
   const { locale, t } = useLocale();
   const [state, formAction, isPending] = useActionState<HymnFormState, FormData>(
-    updateHymns.bind(null, meeting.id, locale),
+    updateHymns.bind(null, date, locale),
     {},
   );
 
-  const firstSunday = isFirstSundayOfMonth(meeting.date);
+  const firstSunday = isFirstSundayOfMonth(date);
 
   const numberLabel = t('form.number');
   const titleLabel = t('form.title');
@@ -110,20 +117,26 @@ export function HymnForm({ meeting }: { meeting: SacramentMeeting }) {
         label={t('form.openingHymn')}
         numberLabel={numberLabel}
         titleLabel={titleLabel}
-        number={meeting.openingHymn.number}
-        title={meeting.openingHymn.title}
+        number={hymns?.openingHymn.number}
+        title={hymns?.openingHymn.title}
         required
-        errors={{ number: state.errors?.openingHymnNumber, title: state.errors?.openingHymnTitle }}
+        errors={{
+          number: state.errors?.openingHymnNumber,
+          title: state.errors?.openingHymnTitle,
+        }}
       />
       <HymnFields
         id="sacramentHymn"
         label={t('form.sacramentHymn')}
         numberLabel={numberLabel}
         titleLabel={titleLabel}
-        number={meeting.sacramentHymn.number}
-        title={meeting.sacramentHymn.title}
+        number={hymns?.sacramentHymn.number}
+        title={hymns?.sacramentHymn.title}
         required
-        errors={{ number: state.errors?.sacramentHymnNumber, title: state.errors?.sacramentHymnTitle }}
+        errors={{
+          number: state.errors?.sacramentHymnNumber,
+          title: state.errors?.sacramentHymnTitle,
+        }}
       />
 
       {!firstSunday ? (
@@ -132,10 +145,13 @@ export function HymnForm({ meeting }: { meeting: SacramentMeeting }) {
           label={t('form.intermediateHymn')}
           numberLabel={numberLabel}
           titleLabel={titleLabel}
-          number={meeting.intermediateHymn?.number}
-          title={meeting.intermediateHymn?.title}
+          number={hymns?.intermediateHymn?.number}
+          title={hymns?.intermediateHymn?.title}
           required
-          errors={{ number: state.errors?.intermediateHymnNumber, title: state.errors?.intermediateHymnTitle }}
+          errors={{
+            number: state.errors?.intermediateHymnNumber,
+            title: state.errors?.intermediateHymnTitle,
+          }}
         />
       ) : (
         <p className="text-sm text-muted">{t('form.firstSundayNote')}</p>
@@ -146,10 +162,13 @@ export function HymnForm({ meeting }: { meeting: SacramentMeeting }) {
         label={t('form.closingHymn')}
         numberLabel={numberLabel}
         titleLabel={titleLabel}
-        number={meeting.closingHymn.number}
-        title={meeting.closingHymn.title}
+        number={hymns?.closingHymn.number}
+        title={hymns?.closingHymn.title}
         required
-        errors={{ number: state.errors?.closingHymnNumber, title: state.errors?.closingHymnTitle }}
+        errors={{
+          number: state.errors?.closingHymnNumber,
+          title: state.errors?.closingHymnTitle,
+        }}
       />
 
       <button
