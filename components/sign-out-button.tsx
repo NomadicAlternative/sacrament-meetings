@@ -1,4 +1,5 @@
 import { signOut } from '@/auth';
+import { LogOutIcon } from '@/components/icons';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
 // Sign-out control rendered only when a session exists (see Header). The
@@ -21,9 +22,11 @@ export function SignOutButton({
     >
       <button
         type="submit"
-        className="block whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
+        aria-label={dict['header.signOut']}
+        title={dict['header.signOut']}
+        className="flex h-9 w-9 items-center justify-center rounded-md text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
       >
-        {dict['header.signOut']}
+        <LogOutIcon className="h-5 w-5" />
       </button>
     </form>
   );

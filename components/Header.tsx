@@ -3,6 +3,7 @@ import { auth } from '@/auth';
 import NavLinks from '@/components/NavLinks';
 import { SignOutButton } from '@/components/sign-out-button';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { LogInIcon } from '@/components/icons';
 import { getLocaleTag } from '@/lib/format';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
@@ -53,9 +54,11 @@ export default async function Header({
             ) : (
               <Link
                 href={`/${locale}/login`}
-                className="block whitespace-nowrap rounded-md px-2.5 py-1.5 text-sm font-medium text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white sm:px-3"
+                aria-label={dict['header.signIn']}
+                title={dict['header.signIn']}
+                className="flex h-9 w-9 items-center justify-center rounded-md text-white/80 transition-colors duration-150 hover:bg-white/10 hover:text-white"
               >
-                {dict['header.signIn']}
+                <LogInIcon className="h-5 w-5" />
               </Link>
             )}
           </div>
