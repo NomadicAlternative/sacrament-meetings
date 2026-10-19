@@ -38,19 +38,26 @@ export default async function Home({
             {dict['home.subtitle']}
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link href={`/${loc}/meetings`} className={primaryButton}>
-              {dict['home.viewMeetings']}
-            </Link>
+            {isMusicDirector ? (
+              <Link href={`/${loc}/meetings/hymns`} className={primaryButton}>
+                {dict['hymns.editHymns']}
+              </Link>
+            ) : (
+              <Link href={`/${loc}/meetings`} className={primaryButton}>
+                {dict['home.viewMeetings']}
+              </Link>
+            )}
             <Link href={`/${loc}/meetings/current`} className={secondaryButton}>
               {dict['home.thisSunday']}
             </Link>
+            {isMusicDirector ? (
+              <Link href={`/${loc}/meetings`} className={secondaryButton}>
+                {dict['home.viewMeetings']}
+              </Link>
+            ) : null}
             {isLeaderRole ? (
               <Link href={`/${loc}/meetings/new`} className={secondaryButton}>
                 {dict['home.createMeeting']}
-              </Link>
-            ) : isMusicDirector ? (
-              <Link href={`/${loc}/meetings/hymns`} className={secondaryButton}>
-                {dict['hymns.editHymns']}
               </Link>
             ) : null}
           </div>

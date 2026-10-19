@@ -52,12 +52,13 @@
   "detail.presiding": "Preside",
   "detail.conducting": "Conduce",
   "detail.openingHymn": "Himno de apertura",
-  "detail.openingPrayer": "Oración de apertura",
+  "detail.openingPrayer": "Primera Oración",
   "detail.sacramentHymn": "Himno sacramental",
+  "detail.blessing": "Bendición de la Santa Cena",
   "detail.intermediateHymn": "Himno intermedio",
   "detail.stakeBusiness": "Asuntos de la estaca",
   "detail.closingHymn": "Himno de clausura",
-  "detail.closingPrayer": "Oración de clausura",
+  "detail.closingPrayer": "Última Oración",
   "detail.yes": "Sí",
   "detail.no": "No",
   "detail.wardBusiness": "Asuntos de la rama",
@@ -157,6 +158,7 @@
   "hymns.selectSunday": "Elige un domingo",
   "hymns.editHymns": "Editar himnos",
   "hymns.loadHymns": "Cargar himnos",
+  "hymns.topics": "Temas del Domingo",
   "hymns.back": "Volver a los himnos",
 
   "requests.title": "Solicitudes de acceso",
@@ -189,5 +191,13 @@
   "changePassword.subtitle": "Por seguridad, elige una nueva contraseña para continuar.",
   "changePassword.password": "Nueva contraseña",
   "changePassword.save": "Guardar contraseña",
-  "changePassword.saving": "Guardando..."
+  "changePassword.saving": "Guardando...",
+
+  "agenda.firstSpeaker": "Primer Discursante",
+  "agenda.secondSpeaker": "Segundo Discursante",
+  "agenda.thirdSpeaker": "Tercer Discursante",
+  "agenda.fourthSpeaker": "Cuarto Discursante",
+  "agenda.fifthSpeaker": "Quinto Discursante",
+  "agenda.sixthSpeaker": "Sexto Discursante",
+  "agenda.speaker": "Discursante"
 }

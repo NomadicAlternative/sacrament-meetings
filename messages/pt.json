@@ -52,12 +52,13 @@
   "detail.presiding": "Preside",
   "detail.conducting": "Conduz",
   "detail.openingHymn": "Hino de abertura",
-  "detail.openingPrayer": "Oração de abertura",
+  "detail.openingPrayer": "Primeira Oração",
   "detail.sacramentHymn": "Hino sacramental",
+  "detail.blessing": "Bênção do Sacramento",
   "detail.intermediateHymn": "Hino intermediário",
   "detail.stakeBusiness": "Assuntos da estaca",
   "detail.closingHymn": "Hino de encerramento",
-  "detail.closingPrayer": "Oração de encerramento",
+  "detail.closingPrayer": "Última Oração",
   "detail.yes": "Sim",
   "detail.no": "Não",
   "detail.wardBusiness": "Assuntos do ramo",
@@ -157,6 +158,7 @@
   "hymns.selectSunday": "Escolha um domingo",
   "hymns.editHymns": "Editar hinos",
   "hymns.loadHymns": "Carregar hinos",
+  "hymns.topics": "Temas do Domingo",
   "hymns.back": "Voltar aos hinos",
 
   "requests.title": "Solicitações de acesso",
@@ -189,5 +191,13 @@
   "changePassword.subtitle": "Por segurança, escolha uma nova senha para continuar.",
   "changePassword.password": "Nova senha",
   "changePassword.save": "Salvar senha",
-  "changePassword.saving": "Salvando..."
+  "changePassword.saving": "Salvando...",
+
+  "agenda.firstSpeaker": "Primeiro Orador",
+  "agenda.secondSpeaker": "Segundo Orador",
+  "agenda.thirdSpeaker": "Terceiro Orador",
+  "agenda.fourthSpeaker": "Quarto Orador",
+  "agenda.fifthSpeaker": "Quinto Orador",
+  "agenda.sixthSpeaker": "Sexto Orador",
+  "agenda.speaker": "Orador"
 }

@@ -11,6 +11,7 @@
   --muted: #64748b;
   --accent: #1f4b88;
   --accent-foreground: #ffffff;
+  --accent-warm: #ea580c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,6 +23,7 @@
     --muted: #94a3b8;
     --accent: #8fb3df;
     --accent-foreground: #0f172a;
+    --accent-warm: #fb923c;
   }
 }
 
@@ -33,6 +35,7 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-warm: var(--accent-warm);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --animate-shimmer: shimmer 1.6s linear infinite;

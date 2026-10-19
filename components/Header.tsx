@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
 import NavLinks from '@/components/NavLinks';
+import { MobileNav } from '@/components/mobile-nav';
 import { SignOutButton } from '@/components/sign-out-button';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LogInIcon } from '@/components/icons';
 import { NotificationBell } from '@/components/notifications-bell';
 import { getLocaleTag } from '@/lib/format';
+import { isLeader } from '@/lib/auth-guards';
 import { countPendingRequests } from '@/lib/users';
 import type { Dictionary, Locale } from '@/lib/i18n';
 
@@ -84,7 +86,10 @@ export default async function Header({
         </div>
 
         <div className="mt-3">
-          <NavLinks isLoggedIn={!!user} />
+          <div className="hidden sm:block">
+            <NavLinks isLeader={isLeader(user?.role)} />
+          </div>
+          <MobileNav isLeader={isLeader(user?.role)} />
         </div>
       </div>
     </header>

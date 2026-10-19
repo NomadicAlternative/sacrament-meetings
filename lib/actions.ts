@@ -486,7 +486,7 @@ export async function changePassword(
   await updatePasswordRow(userId, hash);
 
   revalidatePath(`/${locale}`);
-  redirect(`/${locale}/meetings`);
+  redirect(`/${locale}`);
 }
 
 // Admin user management actions (president only).

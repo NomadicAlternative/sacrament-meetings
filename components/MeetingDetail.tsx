@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { auth } from '@/auth';
 import { isLeader } from '@/lib/auth-guards';
-import type { Hymn as HymnType, SacramentMeeting } from '@/lib/types';
+import type {
+  Hymn as HymnType,
+  SacramentMeeting,
+  SpeakerItem,
+} from '@/lib/types';
 import { formatMeetingDate } from '@/lib/format';
 import { deleteMeeting } from '@/lib/actions';
 import { getHymnsByDate } from '@/lib/hymns-db';
@@ -12,7 +16,7 @@ interface MeetingDetailProps {
   locale: Locale;
 }
 
-// Sub-componente local: el par numero + titulo se repite en tres himnos.
+// Sub-componente local: el par numero + titulo se repite en los himnos.
 function Hymn({ hymn }: { hymn: HymnType }) {
   return (
     <>
@@ -21,7 +25,21 @@ function Hymn({ hymn }: { hymn: HymnType }) {
   );
 }
 
-function Field({
+// Un discursante: nombre destacado y su tema del discurso.
+function Speaker({ speaker }: { speaker: SpeakerItem }) {
+  return (
+    <>
+      <span className="font-medium">{speaker.name}</span>
+      {speaker.topic ? (
+        <span className="text-muted"> &mdash; {speaker.topic}</span>
+      ) : null}
+    </>
+  );
+}
+
+// Item de la agenda: el label va en naranja y en mayusculas (resalta la
+// seccion), el contenido debajo.
+function AgendaItem({
   label,
   children,
 }: {
@@ -29,11 +47,11 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <div>
-      <dt className="text-xs font-medium uppercase tracking-wide text-muted">
+    <div className="border-b border-border/60 py-2.5 last:border-0">
+      <dt className="text-[11px] font-bold uppercase tracking-wider text-accent-warm">
         {label}
       </dt>
-      <dd className="mt-0.5">{children}</dd>
+      <dd className="mt-0.5 text-sm">{children}</dd>
     </div>
   );
 }
@@ -58,6 +76,21 @@ export default async function MeetingDetail({
     sundayHymns?.intermediateHymn ?? meeting.intermediateHymn;
   const closingHymn = sundayHymns?.closingHymn ?? meeting.closingHymn;
 
+  // Discursantes (type 'speaker') y números musicales, en su orden original.
+  const speakers = meeting.speakers.filter((item) => item.type === 'speaker');
+  const musicalNumbers = meeting.speakers.filter(
+    (item) => item.type === 'musical-number',
+  );
+
+  const speakerOrdinals = [
+    dict['agenda.firstSpeaker'],
+    dict['agenda.secondSpeaker'],
+    dict['agenda.thirdSpeaker'],
+    dict['agenda.fourthSpeaker'],
+    dict['agenda.fifthSpeaker'],
+    dict['agenda.sixthSpeaker'],
+  ];
+
   return (
     <article className="rounded-lg border border-border bg-card p-6 shadow-sm">
       <header className="mb-6 border-b border-border pb-4">
@@ -68,9 +101,7 @@ export default async function MeetingDetail({
             </h2>
             <p className="mt-1 text-sm text-muted">{typeLabel}</p>
           </div>
-          {/* Leader actions (hidden from the music director and the public).
-              The delete form is a Server Action wired directly to a Server
-              Component form, so it needs no 'use client'. */}
+          {/* Leader actions (hidden from the music director and the public). */}
           <div className="flex items-center gap-2">
             {canManage ? (
               <>
@@ -93,7 +124,7 @@ export default async function MeetingDetail({
               </>
             ) : isMusicDirector ? (
               <Link
-                href={`/${locale}/meetings/hymns/${meeting.id}`}
+                href={`/${locale}/meetings/hymns/${meeting.date}`}
                 className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 {dict['hymns.editHymns']}
@@ -103,74 +134,85 @@ export default async function MeetingDetail({
         </div>
       </header>
 
-      <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
-        <Field label={dict['detail.presiding']}>{meeting.presiding}</Field>
-        <Field label={dict['detail.conducting']}>{meeting.conducting}</Field>
-        <Field label={dict['detail.openingHymn']}>
+      <dl className="flex flex-col">
+        <AgendaItem label={dict['detail.presiding']}>
+          {meeting.presiding}
+        </AgendaItem>
+        <AgendaItem label={dict['detail.conducting']}>
+          {meeting.conducting}
+        </AgendaItem>
+        <AgendaItem label={dict['detail.openingHymn']}>
           <Hymn hymn={openingHymn} />
-        </Field>
-        <Field label={dict['detail.openingPrayer']}>
+        </AgendaItem>
+        <AgendaItem label={dict['detail.openingPrayer']}>
           {meeting.openingPrayer}
-        </Field>
-        <Field label={dict['detail.sacramentHymn']}>
-          <Hymn hymn={sacramentHymn} />
-        </Field>
-        {intermediateHymn ? (
-          <Field label={dict['detail.intermediateHymn']}>
-            <Hymn hymn={intermediateHymn} />
-          </Field>
-        ) : null}
-        <Field label={dict['detail.stakeBusiness']}>
+        </AgendaItem>
+
+        <AgendaItem label={dict['detail.wardBusiness']}>
+          {meeting.wardBusiness.length > 0 ? (
+            <ul className="list-disc pl-5 text-muted">
+              {meeting.wardBusiness.map((item) => (
+                <li key={item.description}>{item.description}</li>
+              ))}
+            </ul>
+          ) : (
+            dict['detail.none']
+          )}
+        </AgendaItem>
+
+        <AgendaItem label={dict['detail.stakeBusiness']}>
           {meeting.stakeBusiness ? dict['detail.yes'] : dict['detail.no']}
-        </Field>
-        <Field label={dict['detail.closingHymn']}>
+        </AgendaItem>
+
+        <AgendaItem label={dict['detail.sacramentHymn']}>
+          <Hymn hymn={sacramentHymn} />
+        </AgendaItem>
+
+        {/* Fijo en la agenda: no hay dato que completar. */}
+        <AgendaItem label={dict['detail.blessing']}>
+          <span className="text-muted">&mdash;</span>
+        </AgendaItem>
+
+        {speakers[0] ? (
+          <AgendaItem label={speakerOrdinals[0]}>
+            <Speaker speaker={speakers[0]} />
+          </AgendaItem>
+        ) : null}
+
+        {intermediateHymn ? (
+          <AgendaItem label={dict['detail.intermediateHymn']}>
+            <Hymn hymn={intermediateHymn} />
+          </AgendaItem>
+        ) : null}
+
+        {speakers.slice(1).map((speaker, index) => (
+          <AgendaItem
+            key={`${speaker.name}-${index}`}
+            label={
+              speakerOrdinals[index + 1] ??
+              `${dict['agenda.speaker']} ${index + 2}`
+            }
+          >
+            <Speaker speaker={speaker} />
+          </AgendaItem>
+        ))}
+
+        {musicalNumbers.map((item, index) => (
+          <AgendaItem key={`musical-${index}`} label={dict['detail.musicalNumber']}>
+            <span className="font-medium">{item.name}</span>
+            {item.topic ? (
+              <span className="text-muted"> &mdash; {item.topic}</span>
+            ) : null}
+          </AgendaItem>
+        ))}
+
+        <AgendaItem label={dict['detail.closingHymn']}>
           <Hymn hymn={closingHymn} />
-        </Field>
-        <Field label={dict['detail.closingPrayer']}>
+        </AgendaItem>
+        <AgendaItem label={dict['detail.closingPrayer']}>
           {meeting.closingPrayer}
-        </Field>
+        </AgendaItem>
       </dl>
-
-      <section className="mt-6">
-        <h3 className="text-sm font-semibold tracking-tight">
-          {dict['detail.wardBusiness']}
-        </h3>
-        {meeting.wardBusiness.length > 0 ? (
-          <ul className="mt-2 list-disc pl-5 text-sm text-muted">
-            {meeting.wardBusiness.map((item) => (
-              <li key={item.description}>{item.description}</li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-sm text-muted">{dict['detail.none']}</p>
-        )}
-      </section>
-
-      <section className="mt-6">
-        <h3 className="text-sm font-semibold tracking-tight">
-          {dict['detail.speakersTitle']}
-        </h3>
-        {meeting.speakers.length > 0 ? (
-          <ol className="mt-2 flex flex-col gap-2 text-sm">
-            {meeting.speakers.map((item, index) => (
-              <li key={`${item.type}-${index}`}>
-                <span className="font-medium">{item.name}</span>
-                {/* 'type' permite acotar la union: solo un 'speaker' tiene tema. */}
-                {item.type === 'musical-number' ? (
-                  <span className="text-muted">
-                    {' '}
-                    &mdash; {dict['detail.musicalNumber']}
-                  </span>
-                ) : (
-                  <span className="text-muted"> &mdash; {item.topic}</span>
-                )}
-              </li>
-            ))}
-          </ol>
-        ) : (
-          <p className="mt-2 text-sm text-muted">{dict['detail.noSpeakers']}</p>
-        )}
-      </section>
 
       {/* announcements es opcional: si el campo no existe, la seccion entera
           no se renderiza. Distinto de existir con lista vacia. */}
