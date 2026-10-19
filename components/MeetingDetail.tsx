@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
+import { isLeader } from '@/lib/auth-guards';
 import type { Hymn as HymnType, SacramentMeeting } from '@/lib/types';
 import { formatMeetingDate } from '@/lib/format';
 import { deleteMeeting } from '@/lib/actions';
@@ -35,10 +37,14 @@ function Field({
   );
 }
 
-export default function MeetingDetail({
+export default async function MeetingDetail({
   meeting,
   locale,
 }: MeetingDetailProps) {
+  const session = await auth();
+  const user = session?.user;
+  const canManage = user?.status === 'approved' && isLeader(user.role);
+  const isMusicDirector = user?.role === 'music_director';
   const dict = getDictionary(locale);
   const typeLabel = dict[`type.${meeting.meetingType}` as keyof Dictionary];
 
@@ -52,26 +58,37 @@ export default function MeetingDetail({
             </h2>
             <p className="mt-1 text-sm text-muted">{typeLabel}</p>
           </div>
-          {/* Leader actions: edit this meeting or delete it. The delete form is
-              a Server Action wired directly to a Server Component form, so it
-              needs no 'use client'. */}
+          {/* Leader actions (hidden from the music director and the public).
+              The delete form is a Server Action wired directly to a Server
+              Component form, so it needs no 'use client'. */}
           <div className="flex items-center gap-2">
-            <Link
-              href={`/${locale}/meetings/${meeting.id}/edit`}
-              className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-            >
-              {dict['detail.edit']}
-            </Link>
-            <form action={deleteMeeting}>
-              <input type="hidden" name="id" value={meeting.id} />
-              <input type="hidden" name="locale" value={locale} />
-              <button
-                type="submit"
-                className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+            {canManage ? (
+              <>
+                <Link
+                  href={`/${locale}/meetings/${meeting.id}/edit`}
+                  className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                >
+                  {dict['detail.edit']}
+                </Link>
+                <form action={deleteMeeting}>
+                  <input type="hidden" name="id" value={meeting.id} />
+                  <input type="hidden" name="locale" value={locale} />
+                  <button
+                    type="submit"
+                    className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                  >
+                    {dict['detail.delete']}
+                  </button>
+                </form>
+              </>
+            ) : isMusicDirector ? (
+              <Link
+                href={`/${locale}/meetings/hymns/${meeting.id}`}
+                className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors duration-150 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
-                {dict['detail.delete']}
-              </button>
-            </form>
+                {dict['hymns.editHymns']}
+              </Link>
+            ) : null}
           </div>
         </div>
       </header>

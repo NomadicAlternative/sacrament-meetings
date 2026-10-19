@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
+import { auth } from '@/auth';
+import { isLeader } from '@/lib/auth-guards';
 import MeetingForm from '@/components/MeetingForm';
 import { getMeetingById } from '@/lib/meetings-db';
 import { updateMeeting } from '@/lib/actions';
@@ -17,6 +19,16 @@ export default async function EditMeetingPage({
   const { id, locale } = await params;
   const loc: Locale = isLocale(locale) ? locale : 'es';
   const dict = getDictionary(loc);
+
+  // Only leaders may edit meetings; the music director is sent to hymns.
+  const session = await auth();
+  const user = session?.user;
+  if (!user || user.status !== 'approved') {
+    redirect(`/${loc}/login`);
+  }
+  if (!isLeader(user.role)) {
+    redirect(`/${loc}/meetings/hymns`);
+  }
 
   const meeting = await getMeetingById(Number(id));
 

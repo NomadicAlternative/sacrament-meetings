@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { auth } from '@/auth';
+import { isLeader } from '@/lib/auth-guards';
 import { InstallBadges } from '@/components/install-badges';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
 
@@ -18,6 +19,8 @@ export default async function Home({
   const session = await auth();
   const isEditor = session?.user?.status === 'approved';
   const homeTitle = isEditor ? dict['home.titleEditor'] : dict['home.title'];
+  const isLeaderRole = isEditor && isLeader(session?.user?.role);
+  const isMusicDirector = session?.user?.role === 'music_director';
 
   const primaryButton =
     'inline-flex h-11 items-center justify-center rounded-lg bg-accent px-5 text-sm font-semibold text-accent-foreground shadow-md transition duration-150 ease-out hover:opacity-90 active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent';
@@ -41,9 +44,15 @@ export default async function Home({
             <Link href={`/${loc}/meetings/current`} className={secondaryButton}>
               {dict['home.thisSunday']}
             </Link>
-            <Link href={`/${loc}/meetings/new`} className={secondaryButton}>
-              {dict['home.createMeeting']}
-            </Link>
+            {isLeaderRole ? (
+              <Link href={`/${loc}/meetings/new`} className={secondaryButton}>
+                {dict['home.createMeeting']}
+              </Link>
+            ) : isMusicDirector ? (
+              <Link href={`/${loc}/meetings/hymns`} className={secondaryButton}>
+                {dict['hymns.editHymns']}
+              </Link>
+            ) : null}
           </div>
         </div>
 

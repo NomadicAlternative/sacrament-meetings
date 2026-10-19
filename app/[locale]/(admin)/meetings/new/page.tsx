@@ -1,4 +1,7 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
+import { isLeader } from '@/lib/auth-guards';
 import MeetingForm from '@/components/MeetingForm';
 import { createMeeting } from '@/lib/actions';
 import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
@@ -14,6 +17,16 @@ export default async function NewMeetingPage({
   const { locale } = await params;
   const loc: Locale = isLocale(locale) ? locale : 'es';
   const dict = getDictionary(loc);
+
+  // Only leaders may create meetings; the music director is sent to hymns.
+  const session = await auth();
+  const user = session?.user;
+  if (!user || user.status !== 'approved') {
+    redirect(`/${loc}/login`);
+  }
+  if (!isLeader(user.role)) {
+    redirect(`/${loc}/meetings/hymns`);
+  }
 
   return (
     <div className="rounded-lg border border-border bg-card p-6 shadow-sm">

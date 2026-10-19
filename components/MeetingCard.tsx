@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { auth } from '@/auth';
+import { isLeader } from '@/lib/auth-guards';
 import type { SacramentMeeting } from '@/lib/types';
 import { formatShortDate } from '@/lib/format';
 import { deleteMeeting } from '@/lib/actions';
@@ -14,11 +16,14 @@ interface MeetingCardProps {
 
 // Devuelve un <li> a proposito: esta pensado para vivir dentro de un <ul>,
 // y asi el listado no tiene que envolver nada a mano.
-export default function MeetingCard({
+export default async function MeetingCard({
   meeting,
   locale,
   index,
 }: MeetingCardProps) {
+  const session = await auth();
+  const canManage =
+    session?.user?.status === 'approved' && isLeader(session.user.role);
   const dict = getDictionary(locale);
   const speakerCount = meeting.speakers.filter(
     (item) => item.type === 'speaker',
@@ -67,16 +72,18 @@ export default function MeetingCard({
           inside an anchor is invalid HTML and breaks the card's navigation.
           A Server Action can be wired to a Server Component form directly, so
           this needs no 'use client'. */}
-      <form action={deleteMeeting} className="mt-2 flex justify-end">
-        <input type="hidden" name="id" value={meeting.id} />
-        <input type="hidden" name="locale" value={locale} />
-        <button
-          type="submit"
-          className="rounded-md border border-border px-3 py-1 text-sm font-medium text-muted transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-        >
-          {dict['card.delete']}
-        </button>
-      </form>
+      {canManage ? (
+        <form action={deleteMeeting} className="mt-2 flex justify-end">
+          <input type="hidden" name="id" value={meeting.id} />
+          <input type="hidden" name="locale" value={locale} />
+          <button
+            type="submit"
+            className="rounded-md border border-border px-3 py-1 text-sm font-medium text-muted transition-colors duration-150 hover:border-red-600 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+          >
+            {dict['card.delete']}
+          </button>
+        </form>
+      ) : null}
     </li>
   );
 }
