@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import MeetingCard from '@/components/MeetingCard';
-import MeetingSearch from '@/components/MeetingSearch';
 import Pagination from '@/components/Pagination';
 import { getMeetings, getMeetingsTotalPages } from '@/lib/meetings-db';
 import { getDictionary, isLocale, makeT, type Locale } from '@/lib/i18n';
@@ -46,8 +45,6 @@ export default async function MeetingsPage({
 
   return (
     <div>
-      <MeetingSearch />
-
       {meetings.length === 0 ? (
         <p className="text-sm text-muted">
           {t('meetings.empty', { query })}
