@@ -6,7 +6,10 @@ import { AuthError } from 'next-auth';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { signIn } from '@/auth';
-import { requireLeaderSession } from '@/lib/auth-guards';
+import {
+  requireHymnEditorSession,
+  requireLeaderSession,
+} from '@/lib/auth-guards';
 import {
   MeetingFormSchema,
   type MeetingFormInput,
@@ -14,11 +17,13 @@ import {
 } from '@/lib/meeting-form-schema';
 import {
   addMeeting,
+  getMeetingById,
   updateMeeting as updateMeetingRow,
   deleteMeeting as deleteMeetingRow,
 } from '@/lib/meetings-db';
 import { createMembershipRequest, getUserByEmail } from '@/lib/users';
 import type { Locale } from '@/lib/i18n';
+import { isFirstSundayOfMonth } from '@/lib/format';
 import {
   REQUESTABLE_ROLES,
   type Hymn,
@@ -131,10 +136,14 @@ function buildMeeting(data: MeetingFormInput): Omit<SacramentMeeting, 'id'> {
       number: data.sacramentHymnNumber,
       title: data.sacramentHymnTitle,
     },
-    intermediateHymn: buildOptionalHymn(
-      data.intermediateHymnNumber,
-      data.intermediateHymnTitle,
-    ),
+    // The intermediate hymn is omitted on the first Sunday of the month even
+    // if the fields arrive (defense in depth against a hand-crafted POST).
+    intermediateHymn: isFirstSundayOfMonth(data.date)
+      ? undefined
+      : buildOptionalHymn(
+          data.intermediateHymnNumber,
+          data.intermediateHymnTitle,
+        ),
     speakers: parseSpeakers(data.speakers),
     closingHymn: {
       number: data.closingHymnNumber,
@@ -310,4 +319,86 @@ export async function requestAccess(
   });
 
   return { sent: true };
+}
+
+// Hymns-only form used by the music director (and accessible to leaders). It
+// validates the flat hymn fields and updates only the four hymn columns.
+const HymnFormSchema = z.object({
+  openingHymnNumber: z.coerce.number(),
+  openingHymnTitle: z.string().min(1),
+  sacramentHymnNumber: z.coerce.number(),
+  sacramentHymnTitle: z.string().min(1),
+  intermediateHymnNumber: z.coerce.number().optional(),
+  intermediateHymnTitle: z.string().optional(),
+  closingHymnNumber: z.coerce.number(),
+  closingHymnTitle: z.string().min(1),
+});
+
+export type HymnFormState = {
+  errors?: Record<string, string[]>;
+  message?: string | null;
+};
+
+export async function updateHymns(
+  id: number,
+  locale: Locale,
+  prevState: HymnFormState,
+  formData: FormData,
+): Promise<HymnFormState> {
+  await requireHymnEditorSession();
+
+  const meeting = await getMeetingById(id);
+  if (!meeting) {
+    return { message: 'This meeting no longer exists.' };
+  }
+
+  const parsed = HymnFormSchema.safeParse({
+    openingHymnNumber: formData.get('openingHymnNumber'),
+    openingHymnTitle: formData.get('openingHymnTitle'),
+    sacramentHymnNumber: formData.get('sacramentHymnNumber'),
+    sacramentHymnTitle: formData.get('sacramentHymnTitle'),
+    intermediateHymnNumber: formData.get('intermediateHymnNumber'),
+    intermediateHymnTitle: formData.get('intermediateHymnTitle'),
+    closingHymnNumber: formData.get('closingHymnNumber'),
+    closingHymnTitle: formData.get('closingHymnTitle'),
+  });
+
+  if (!parsed.success) {
+    return {
+      errors: parsed.error.flatten().fieldErrors,
+      message: 'Please correct the fields highlighted below.',
+    };
+  }
+
+  const firstSunday = isFirstSundayOfMonth(meeting.date);
+
+  const updates: Partial<SacramentMeeting> = {
+    openingHymn: {
+      number: parsed.data.openingHymnNumber,
+      title: parsed.data.openingHymnTitle,
+    },
+    sacramentHymn: {
+      number: parsed.data.sacramentHymnNumber,
+      title: parsed.data.sacramentHymnTitle,
+    },
+    closingHymn: {
+      number: parsed.data.closingHymnNumber,
+      title: parsed.data.closingHymnTitle,
+    },
+    intermediateHymn: firstSunday
+      ? undefined
+      : buildOptionalHymn(
+          parsed.data.intermediateHymnNumber,
+          parsed.data.intermediateHymnTitle,
+        ),
+  };
+
+  try {
+    await updateMeetingRow(id, updates);
+  } catch {
+    return { message: 'Database error: could not update the hymns.' };
+  }
+
+  revalidatePath(`/${locale}/meetings`);
+  redirect(`/${locale}/meetings/hymns`);
 }

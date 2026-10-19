@@ -178,8 +178,11 @@ export async function addMeeting(
 // COALESCE keeps the existing column value when a field is absent from
 // `updates`. Passing NULL for a JSONB/text column inside `${}` is safe: the
 // ::jsonb cast turns it into NULL::jsonb, so COALESCE falls back to the old
-// value instead of overwriting it. The intermediate hymn is nullable, so an
-// explicit undefined means "keep", while null means "clear it".
+// value instead of overwriting it.
+//
+// intermediate_hymn is the exception: the edit form always submits the full
+// meeting, and an absent intermediate hymn must CLEAR the column (first Sunday
+// of the month), so it is set directly instead of through COALESCE.
 export async function updateMeeting(
   id: number,
   updates: Partial<SacramentMeeting>,
@@ -197,7 +200,7 @@ export async function updateMeeting(
       ward_business      = COALESCE(${updates.wardBusiness ? JSON.stringify(updates.wardBusiness) : null}::jsonb, ward_business),
       stake_business     = COALESCE(${updates.stakeBusiness ?? null}, stake_business),
       sacrament_hymn     = COALESCE(${updates.sacramentHymn ? JSON.stringify(updates.sacramentHymn) : null}::jsonb, sacrament_hymn),
-      intermediate_hymn  = COALESCE(${updates.intermediateHymn ? JSON.stringify(updates.intermediateHymn) : null}::jsonb, intermediate_hymn),
+      intermediate_hymn  = ${updates.intermediateHymn ? JSON.stringify(updates.intermediateHymn) : null}::jsonb,
       speakers           = COALESCE(${updates.speakers ? JSON.stringify(updates.speakers) : null}::jsonb, speakers),
       closing_hymn       = COALESCE(${updates.closingHymn ? JSON.stringify(updates.closingHymn) : null}::jsonb, closing_hymn),
       closing_prayer     = COALESCE(${updates.closingPrayer ?? null}, closing_prayer)

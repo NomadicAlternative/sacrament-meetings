@@ -51,6 +51,7 @@
   "detail.openingHymn": "Hino de abertura",
   "detail.openingPrayer": "Oração de abertura",
   "detail.sacramentHymn": "Hino sacramental",
+  "detail.intermediateHymn": "Hino intermediário",
   "detail.stakeBusiness": "Assuntos da estaca",
   "detail.closingHymn": "Hino de encerramento",
   "detail.closingPrayer": "Oração de encerramento",
@@ -71,6 +72,8 @@
   "form.openingHymn": "Hino de abertura",
   "form.openingPrayer": "Oração de abertura",
   "form.sacramentHymn": "Hino sacramental",
+  "form.intermediateHymn": "Hino intermediário",
+  "form.firstSundayNote": "No primeiro domingo do mês não se canta hino intermediário.",
   "form.closingHymn": "Hino de encerramento",
   "form.closingPrayer": "Oração de encerramento",
   "form.number": "Número",
@@ -143,5 +146,11 @@
   "request.submit": "Enviar solicitação",
   "request.sending": "Enviando...",
   "request.sent": "Solicitação enviada. Aguarde a aprovação do Presidente.",
-  "request.close": "Fechar"
+  "request.close": "Fechar",
+
+  "hymns.title": "Hinos",
+  "hymns.subtitle": "Selecione os hinos de cada domingo.",
+  "hymns.selectSunday": "Escolha um domingo",
+  "hymns.editHymns": "Editar hinos",
+  "hymns.back": "Voltar aos hinos"
 }

@@ -51,6 +51,15 @@ export function formatShortDate(isoDate: string, locale: Locale): string {
   });
 }
 
+// El primer domingo del mes es un domingo cuyo dia cae entre 1 y 7. En ese
+// domingo (ayuno y testimonios) no se canta himno intermedio, asi que el
+// formulario y la plantilla lo omiten.
+export function isFirstSundayOfMonth(isoDate: string): boolean {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCDay() === 0 && day >= 1 && day <= 7;
+}
+
 // Helper para los componentes: la etiqueta de tipo vive en los diccionarios
 // (type.testimony, type.regular, ...), asi que aqui solo se expone el tipo.
 export type { MeetingType };

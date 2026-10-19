@@ -1,0 +1,47 @@
+import Link from 'next/link';
+import { notFound, redirect } from 'next/navigation';
+import { auth } from '@/auth';
+import { isLeader } from '@/lib/auth-guards';
+import { HymnForm } from '@/components/hymn-form';
+import { getMeetingById } from '@/lib/meetings-db';
+import { formatMeetingDate } from '@/lib/format';
+import { getDictionary, isLocale, type Locale } from '@/lib/i18n';
+
+export default async function EditHymnsPage({
+  params,
+}: {
+  params: Promise<{ id: string; locale: string }>;
+}) {
+  const { id, locale } = await params;
+  const loc: Locale = isLocale(locale) ? locale : 'es';
+  const dict = getDictionary(loc);
+
+  const session = await auth();
+  const user = session?.user;
+  if (!user || user.status !== 'approved') {
+    redirect(`/${loc}/login`);
+  }
+  if (user.role !== 'music_director' && !isLeader(user.role)) {
+    redirect(`/${loc}/meetings`);
+  }
+
+  const meeting = await getMeetingById(Number(id));
+  if (!meeting) {
+    notFound();
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+      <Link
+        href={`/${loc}/meetings/hymns`}
+        className="inline-block text-sm font-medium text-accent underline-offset-4 hover:underline"
+      >
+        {dict['hymns.back']}
+      </Link>
+      <h2 className="mt-2 text-xl font-semibold tracking-tight">
+        {formatMeetingDate(meeting.date, loc)}
+      </h2>
+      <HymnForm meeting={meeting} />
+    </div>
+  );
+}
