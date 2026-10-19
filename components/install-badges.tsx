@@ -14,7 +14,7 @@ function PlayIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-7 w-7 shrink-0"
+      className="h-5 w-5 shrink-0"
       fill="currentColor"
       aria-hidden="true"
     >
@@ -27,7 +27,7 @@ function AppleIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="h-7 w-7 shrink-0"
+      className="h-5 w-5 shrink-0"
       fill="currentColor"
       aria-hidden="true"
     >
@@ -64,7 +64,7 @@ export function InstallBadges() {
   }
 
   const badgeClass =
-    'flex items-center gap-3 rounded-lg bg-accent px-5 py-2.5 text-left text-white shadow-md transition hover:opacity-90';
+    'flex items-center gap-3 rounded-lg bg-accent px-4 py-2 text-left text-white shadow-md transition hover:opacity-90';
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -76,10 +76,10 @@ export function InstallBadges() {
         >
           <PlayIcon />
           <span className="flex flex-col leading-tight">
-            <span className="text-[10px] uppercase tracking-wide text-white/80">
+            <span className="text-[9px] uppercase tracking-wide text-white/80">
               {t('install.onGooglePlay')}
             </span>
-            <span className="text-lg font-semibold">
+            <span className="text-base font-semibold">
               {t('install.googlePlay')}
             </span>
           </span>
@@ -92,10 +92,10 @@ export function InstallBadges() {
         >
           <AppleIcon />
           <span className="flex flex-col leading-tight">
-            <span className="text-[10px] uppercase tracking-wide text-white/80">
+            <span className="text-[9px] uppercase tracking-wide text-white/80">
               {t('install.onAppStore')}
             </span>
-            <span className="text-lg font-semibold">{t('install.appStore')}</span>
+            <span className="text-base font-semibold">{t('install.appStore')}</span>
           </span>
         </button>
       </div>
